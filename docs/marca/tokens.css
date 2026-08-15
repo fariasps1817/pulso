@@ -99,6 +99,9 @@
 
   --cor-marca:       var(--mare-700);
   --cor-marca-sol:   var(--sol-300);
+  /* Cápsula do símbolo. No tema escuro a versão oficial do logo dispensa a
+     cápsula (ver §6.2, logo-horizontal-escuro.svg), então o token some. */
+  --cor-marca-capsula: var(--mare-700);
 
   /* estados financeiros — sempre com ícone + texto, nunca só cor */
   --pago-texto: #0B5C3B; --pago-fundo: #E7F6EE; --pago-borda: #BCE5CE; --pago-forte: var(--verde-600);
@@ -143,6 +146,7 @@
 
     --cor-marca:      var(--areia-0);
     --cor-marca-sol:  var(--sol-300);
+    --cor-marca-capsula: transparent;
 
     --pago-texto: #7BE8B4; --pago-fundo: #0D2A1E; --pago-borda: #1B4633; --pago-forte: var(--verde-400);
     --avencer-texto: #FFD07A; --avencer-fundo: #2E2008; --avencer-borda: #4D3A12; --avencer-forte: var(--sol-400);
@@ -184,6 +188,7 @@
 
   --cor-marca:      var(--areia-0);
   --cor-marca-sol:  var(--sol-300);
+  --cor-marca-capsula: transparent;
 
   --pago-texto: #7BE8B4; --pago-fundo: #0D2A1E; --pago-borda: #1B4633; --pago-forte: var(--verde-400);
   --avencer-texto: #FFD07A; --avencer-fundo: #2E2008; --avencer-borda: #4D3A12; --avencer-forte: var(--sol-400);

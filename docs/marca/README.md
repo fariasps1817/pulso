@@ -164,6 +164,8 @@ O logotipo "PULSO" é **monolinear geométrico desenhado sob medida**: mesma esp
 | `assets/icone-app.svg` | Ícone de aplicativo, 1024×1024 |
 | `assets/acesso-liberado.svg` / `acesso-bloqueado.svg` | Display da catraca |
 
+**No sistema, o logo não é `<img>`:** é o componente Blade `x-marca.logo`, com o SVG embutido. Isso permite que ele responda ao tema sem duplicar arquivo — a cápsula usa `--cor-marca-capsula` (Maré 700 no claro, `transparent` no escuro, reproduzindo `logo-horizontal-escuro.svg`) e o logotipo usa `--cor-marca`. Os SVGs desta pasta continuam sendo a referência e o que se envia para fornecedor, gráfica e redes.
+
 ### 6.3 Regras de uso
 
 - **Respiro:** margem livre em todos os lados igual à altura da cápsula ÷ 2. Nada entra nessa área.

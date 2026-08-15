@@ -1,0 +1,200 @@
+@import 'tailwindcss';
+
+/* -------------------------------------------------------------------------
+   Fonte da verdade das cores: docs/marca/tokens.css
+   Importado direto da pasta de marca, sem copia — assim o guia e o sistema
+   nunca divergem. Ao alterar um valor la, revalide os contrastes (WCAG 2.1 AA)
+   antes de subir; o proprio arquivo documenta as razoes medidas.
+   ------------------------------------------------------------------------- */
+@import '../../docs/marca/tokens.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/* -------------------------------------------------------------------------
+   Ponte tokens -> Tailwind.
+
+   `inline` e essencial aqui: faz a classe utilitaria emitir var(--cor-x)
+   direto, em vez de congelar o valor. Sem isso, a troca de tema (claro /
+   escuro / sistema) nao chegaria nas classes do Tailwind.
+
+   Regra do guia de marca, valida sem excecao: componente nenhum escreve cor
+   literal e nenhum declara cor dentro de @media ou [data-theme]. Somente os
+   tokens mudam por tema — por isso este projeto NAO usa a variante `dark:`.
+   ------------------------------------------------------------------------- */
+@theme inline {
+    /* ---------- tipografia ---------- */
+    --font-titulo: var(--fonte-titulo);
+    --font-texto: var(--fonte-texto);
+    --font-sans: var(--fonte-texto);
+
+    --text-xs: var(--txt-xs);
+    --text-sm: var(--txt-sm);
+    --text-base: var(--txt-base);
+    --text-lg: var(--txt-lg);
+    --text-xl: var(--txt-xl);
+    --text-2xl: var(--txt-2xl);
+    --text-3xl: var(--txt-3xl);
+    --text-4xl: var(--txt-4xl);
+
+    /* ---------- rampas fixas da marca ---------- */
+    --color-mare-50: var(--mare-50);
+    --color-mare-100: var(--mare-100);
+    --color-mare-200: var(--mare-200);
+    --color-mare-300: var(--mare-300);
+    --color-mare-400: var(--mare-400);
+    --color-mare-500: var(--mare-500);
+    --color-mare-600: var(--mare-600);
+    --color-mare-700: var(--mare-700);
+    --color-mare-800: var(--mare-800);
+    --color-mare-900: var(--mare-900);
+    --color-mare-950: var(--mare-950);
+
+    --color-sol-50: var(--sol-50);
+    --color-sol-100: var(--sol-100);
+    --color-sol-200: var(--sol-200);
+    --color-sol-300: var(--sol-300);
+    --color-sol-400: var(--sol-400);
+    --color-sol-500: var(--sol-500);
+    --color-sol-600: var(--sol-600);
+    --color-sol-700: var(--sol-700);
+    --color-sol-800: var(--sol-800);
+    --color-sol-900: var(--sol-900);
+
+    --color-areia-0: var(--areia-0);
+    --color-areia-50: var(--areia-50);
+    --color-areia-100: var(--areia-100);
+    --color-areia-200: var(--areia-200);
+    --color-areia-300: var(--areia-300);
+    --color-areia-400: var(--areia-400);
+    --color-areia-500: var(--areia-500);
+    --color-areia-600: var(--areia-600);
+    --color-areia-700: var(--areia-700);
+    --color-areia-800: var(--areia-800);
+    --color-areia-900: var(--areia-900);
+    --color-areia-950: var(--areia-950);
+
+    /* ---------- semanticos: mudam com o tema ---------- */
+    --color-fundo: var(--cor-fundo);
+    --color-superficie: var(--cor-superficie);
+    --color-superficie-2: var(--cor-superficie-2);
+    --color-borda: var(--cor-borda);
+    --color-borda-forte: var(--cor-borda-forte);
+
+    --color-texto: var(--cor-texto);
+    --color-texto-2: var(--cor-texto-2);
+    --color-texto-mudo: var(--cor-texto-mudo);
+
+    --color-acao: var(--cor-acao);
+    --color-acao-hover: var(--cor-acao-hover);
+    --color-acao-texto: var(--cor-acao-texto);
+    --color-acao-sutil: var(--cor-acao-sutil);
+    --color-foco: var(--cor-foco);
+
+    --color-marca: var(--cor-marca);
+    --color-marca-sol: var(--cor-marca-sol);
+
+    /* ---------- estados financeiros ---------- */
+    --color-pago-texto: var(--pago-texto);
+    --color-pago-fundo: var(--pago-fundo);
+    --color-pago-borda: var(--pago-borda);
+    --color-pago-forte: var(--pago-forte);
+
+    --color-avencer-texto: var(--avencer-texto);
+    --color-avencer-fundo: var(--avencer-fundo);
+    --color-avencer-borda: var(--avencer-borda);
+    --color-avencer-forte: var(--avencer-forte);
+
+    --color-vencido-texto: var(--vencido-texto);
+    --color-vencido-fundo: var(--vencido-fundo);
+    --color-vencido-borda: var(--vencido-borda);
+    --color-vencido-forte: var(--vencido-forte);
+
+    --color-freq-texto: var(--freq-texto);
+    --color-freq-fundo: var(--freq-fundo);
+    --color-freq-borda: var(--freq-borda);
+    --color-freq-forte: var(--freq-forte);
+
+    /* ---------- graficos: ordem fixa, nunca reciclada ---------- */
+    --color-graf-1: var(--graf-1);
+    --color-graf-2: var(--graf-2);
+    --color-graf-3: var(--graf-3);
+    --color-graf-4: var(--graf-4);
+    --color-graf-5: var(--graf-5);
+    --color-graf-6: var(--graf-6);
+    --color-graf-grade: var(--graf-grade);
+
+    /* ---------- forma e elevacao ---------- */
+    --radius-sm: var(--r-sm);
+    --radius-md: var(--r-md);
+    --radius-lg: var(--r-lg);
+    --radius-xl: var(--r-xl);
+    --radius-pill: var(--r-pill);
+
+    --shadow-1: var(--sombra-1);
+    --shadow-2: var(--sombra-2);
+    --shadow-3: var(--sombra-3);
+
+    /* alvo minimo de toque — a equipe usa o sistema no celular */
+    --spacing-toque: var(--alvo-toque);
+}
+
+/* -------------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------------- */
+@layer base {
+    h1,
+    h2,
+    h3,
+    h4 {
+        font-family: var(--fonte-titulo);
+        font-weight: 700;
+        letter-spacing: -0.015em;
+    }
+
+    /* Linha de texto corrido no maximo em ~65 caracteres (guia de marca). */
+    .prosa {
+        max-width: 65ch;
+    }
+}
+
+@utility numeros {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+}
+
+/* -------------------------------------------------------------------------
+   Alternador de tema — unica regra do projeto que consulta o tema vigente.
+
+   Nao viola a regra do guia de marca: aqui nao se declara cor nenhuma, apenas
+   qual dos dois icones fica visivel. Cor continua vindo so de token.
+   ------------------------------------------------------------------------- */
+.alternador-tema .icone-escuro {
+    display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .alternador-tema .icone-claro {
+        display: none;
+    }
+
+    :root:not([data-theme='light']) .alternador-tema .icone-escuro {
+        display: block;
+    }
+}
+
+:root[data-theme='dark'] .alternador-tema .icone-claro {
+    display: none;
+}
+
+:root[data-theme='dark'] .alternador-tema .icone-escuro {
+    display: block;
+}
+
+:root[data-theme='light'] .alternador-tema .icone-claro {
+    display: block;
+}
+
+:root[data-theme='light'] .alternador-tema .icone-escuro {
+    display: none;
+}

@@ -1,0 +1,16 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - config
+        - database
+        - routes
+        - tests
+
+    # Nivel 6 e o ponto onde a analise passa a exigir tipagem de verdade sem
+    # brigar com o Eloquent. Subir para 8 quando o dominio estiver estavel.
+    level: 6
+
+    checkModelProperties: true
