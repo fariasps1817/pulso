@@ -1,0 +1,550 @@
+<title>Marca Pulso</title>
+<style>
+  :root {
+    --mare-50:#ECF7FB; --mare-100:#D3EDF6; --mare-200:#A6DAEC; --mare-300:#6DC0DC;
+    --mare-400:#35A2C4; --mare-500:#1385A9; --mare-600:#0A6B8C; --mare-700:#0A5673;
+    --mare-800:#0D475D; --mare-900:#103B4D; --mare-950:#07222E;
+    --sol-100:#FFEDC2; --sol-200:#FFDA85; --sol-300:#FFC64A; --sol-400:#FAB01B;
+    --sol-500:#E09600; --sol-600:#C77400; --sol-800:#8F5C00;
+
+    --fundo:#F6F9FA; --superficie:#FFFFFF; --superficie-2:#EDF2F4;
+    --borda:#DEE7EA; --borda-forte:#6D8189;
+    --texto:#1A252B; --texto-2:#45565E; --texto-mudo:#5F7279;
+    --acao:#0A6B8C; --acao-texto:#FFFFFF; --foco:#1385A9;
+
+    --logo-capsula:#0A5673; --logo-pulso:#FFC64A; --logo-texto:#103B4D;
+
+    --pago-t:#0B5C3B; --pago-f:#E7F6EE; --pago-b:#BCE5CE;
+    --avencer-t:#7A4E00; --avencer-f:#FFF3D6; --avencer-b:#F5DFA8;
+    --vencido-t:#93211A; --vencido-f:#FDEAE7; --vencido-b:#F7C9C2;
+    --freq-t:#4B33A8; --freq-f:#EFEBFD; --freq-b:#D8CFFA;
+
+    --seq-1:#6DC0DC; --seq-2:#35A2C4; --seq-3:#1385A9;
+    --seq-4:#0A6B8C; --seq-5:#0A5673; --seq-6:#103B4D;
+
+    --sombra:0 1px 2px rgb(13 23 28 / .06), 0 1px 3px rgb(13 23 28 / .08);
+    --r-md:10px; --r-lg:16px; --r-xl:22px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --fundo:#0B1519; --superficie:#101F25; --superficie-2:#16282F;
+      --borda:#26424B; --borda-forte:#557D87;
+      --texto:#E8F0F2; --texto-2:#C2D3D9; --texto-mudo:#9CB2BA;
+      --acao:#6DC0DC; --acao-texto:#07222E; --foco:#6DC0DC;
+      --logo-capsula:transparent; --logo-pulso:#FFC64A; --logo-texto:#E8F0F2;
+      --pago-t:#7BE8B4; --pago-f:#0D2A1E; --pago-b:#1B4633;
+      --avencer-t:#FFD07A; --avencer-f:#2E2008; --avencer-b:#4D3A12;
+      --vencido-t:#FFB3A8; --vencido-f:#2E1512; --vencido-b:#57241E;
+      --freq-t:#C9BCFF; --freq-f:#1E1840; --freq-b:#332B63;
+      --seq-1:#0A5673; --seq-2:#0A6B8C; --seq-3:#1385A9;
+      --seq-4:#35A2C4; --seq-5:#6DC0DC; --seq-6:#A6DAEC;
+      --sombra:0 1px 2px rgb(0 0 0 / .4), 0 4px 12px rgb(0 0 0 / .3);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --fundo:#0B1519; --superficie:#101F25; --superficie-2:#16282F;
+    --borda:#26424B; --borda-forte:#557D87;
+    --texto:#E8F0F2; --texto-2:#C2D3D9; --texto-mudo:#9CB2BA;
+    --acao:#6DC0DC; --acao-texto:#07222E; --foco:#6DC0DC;
+    --logo-capsula:transparent; --logo-pulso:#FFC64A; --logo-texto:#E8F0F2;
+    --pago-t:#7BE8B4; --pago-f:#0D2A1E; --pago-b:#1B4633;
+    --avencer-t:#FFD07A; --avencer-f:#2E2008; --avencer-b:#4D3A12;
+    --vencido-t:#FFB3A8; --vencido-f:#2E1512; --vencido-b:#57241E;
+    --freq-t:#C9BCFF; --freq-f:#1E1840; --freq-b:#332B63;
+    --seq-1:#0A5673; --seq-2:#0A6B8C; --seq-3:#1385A9;
+    --seq-4:#35A2C4; --seq-5:#6DC0DC; --seq-6:#A6DAEC;
+    --sombra:0 1px 2px rgb(0 0 0 / .4), 0 4px 12px rgb(0 0 0 / .3);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin:0; background:var(--fundo); color:var(--texto);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:1060px; margin:0 auto; padding:32px 20px 96px; }
+
+  .barra {
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    flex-wrap:wrap; margin-bottom:40px;
+  }
+  .btn-tema {
+    font:inherit; font-size:14px; font-weight:600; cursor:pointer;
+    background:var(--superficie); color:var(--texto); border:1px solid var(--borda-forte);
+    border-radius:999px; padding:9px 18px; min-height:44px;
+  }
+  .btn-tema:hover { background:var(--superficie-2); }
+  :where(a,button):focus-visible { outline:2px solid var(--foco); outline-offset:2px; }
+
+  h1 { font-size:clamp(2rem,5vw,2.75rem); line-height:1.1; margin:0 0 8px; letter-spacing:-.02em; text-wrap:balance; }
+  h2 { font-size:1.375rem; line-height:1.25; margin:0 0 4px; letter-spacing:-.01em; text-wrap:balance; }
+  h3 { font-size:1rem; margin:0 0 8px; }
+  p { margin:0 0 12px; max-width:64ch; color:var(--texto-2); }
+  .sub { color:var(--texto-mudo); }
+
+  .eyebrow {
+    font-size:.6875rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--texto-mudo); margin:0 0 10px;
+  }
+  section { margin-top:56px; }
+  .cabecalho-secao { border-top:1px solid var(--borda); padding-top:20px; margin-bottom:20px; }
+
+  .cartao {
+    background:var(--superficie); border:1px solid var(--borda);
+    border-radius:var(--r-lg); padding:20px; box-shadow:var(--sombra);
+  }
+  .grade { display:grid; gap:16px; }
+  .g2 { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+  .g3 { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+  .g4 { grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); }
+
+  .num { font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1; }
+
+  /* ---- logo ---- */
+  .logo { display:block; height:auto; }
+  .tile {
+    display:flex; align-items:center; justify-content:center;
+    border-radius:var(--r-md); padding:24px 16px; min-height:104px;
+  }
+  .tile-claro { background:#FFFFFF; border:1px solid #DEE7EA; }
+  .tile-escuro { background:#0B1519; }
+  .tile-sol { background:#FAB01B; }
+  .legenda { font-size:.75rem; color:var(--texto-mudo); margin-top:8px; }
+
+  /* ---- cores ---- */
+  .swatch-grande {
+    border-radius:var(--r-md); padding:20px; min-height:120px;
+    display:flex; flex-direction:column; justify-content:flex-end; gap:2px;
+  }
+  .swatch-grande b { font-size:1.0625rem; }
+  .swatch-grande span { font-size:.8125rem; opacity:.85; }
+  .rampa { display:flex; border-radius:8px; overflow:hidden; border:1px solid var(--borda); }
+  .rampa div { flex:1; height:44px; }
+  .rampa-rot { display:flex; justify-content:space-between; font-size:.6875rem; color:var(--texto-mudo); margin-top:6px; }
+
+  /* ---- chips ---- */
+  .chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 11px; border-radius:999px; font-size:.8125rem; font-weight:600;
+    border:1px solid transparent;
+  }
+  .chip svg { flex:none; }
+  .c-pago{color:var(--pago-t);background:var(--pago-f);border-color:var(--pago-b);}
+  .c-avencer{color:var(--avencer-t);background:var(--avencer-f);border-color:var(--avencer-b);}
+  .c-vencido{color:var(--vencido-t);background:var(--vencido-f);border-color:var(--vencido-b);}
+  .c-freq{color:var(--freq-t);background:var(--freq-f);border-color:var(--freq-b);}
+
+  /* ---- tabela ---- */
+  .rolagem { overflow-x:auto; }
+  table { border-collapse:collapse; width:100%; font-size:.875rem; }
+  th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--borda); }
+  th { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--texto-mudo); font-weight:700; }
+  td.dir, th.dir { text-align:right; }
+
+  /* ---- amostra de UI ---- */
+  .kpi { background:var(--superficie-2); border-radius:var(--r-md); padding:14px 16px; }
+  .kpi .rot { font-size:.75rem; color:var(--texto-mudo); font-weight:600; }
+  .kpi .val { font-size:1.5rem; font-weight:700; letter-spacing:-.02em; margin-top:2px; }
+  .kpi .det { font-size:.75rem; color:var(--texto-mudo); }
+  .lista-aluno { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--borda); }
+  .lista-aluno:last-child { border-bottom:0; }
+  .aluno-nome { font-weight:600; font-size:.9375rem; }
+  .aluno-det { font-size:.8125rem; color:var(--texto-mudo); }
+
+  .faixa { display:flex; gap:3px; }
+  .faixa div { flex:1; height:34px; border-radius:4px; }
+  .faixa-rot { display:flex; gap:3px; margin-top:6px; }
+  .faixa-rot span { flex:1; text-align:center; font-size:.625rem; color:var(--texto-mudo); }
+  .legenda-seq { display:flex; align-items:center; gap:8px; font-size:.75rem; color:var(--texto-mudo); margin-top:12px; }
+  .legenda-seq i { width:18px; height:12px; border-radius:3px; display:inline-block; }
+
+  ol.passos { margin:0; padding-left:20px; color:var(--texto-2); }
+  ol.passos li { margin-bottom:8px; max-width:62ch; }
+
+  .nota { font-size:.8125rem; color:var(--texto-mudo); border-left:2px solid var(--borda-forte); padding-left:12px; margin-top:16px; }
+  @media (prefers-reduced-motion:reduce){ *{animation-duration:.01ms!important;transition-duration:.01ms!important;} }
+</style>
+
+<div class="wrap">
+
+  <div class="barra">
+    <svg class="logo" viewBox="0 0 240 88" width="216" height="79" role="img" aria-label="Pulso">
+      <rect x="0" y="8" width="72" height="72" rx="22" fill="var(--logo-capsula)"/>
+      <path d="M 14 50 H 26 L 33 32 L 41 60 L 48 40 H 58" fill="none" stroke="var(--logo-pulso)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 92 28 V 60 M 92 28 H 103 A 9 9 0 0 1 103 46 H 92 M 120 28 V 47 A 13 13 0 0 0 146 47 V 28 M 154 28 V 60 H 170 M 194 36 A 8 8 0 1 0 186 44 A 8 8 0 1 1 178 52 M 202 44 A 16 16 0 1 1 234 44 A 16 16 0 1 1 202 44" fill="none" stroke="var(--logo-texto)" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <button class="btn-tema" id="tema" type="button">Ver no tema escuro</button>
+  </div>
+
+  <h1>O pulso da sua academia.</h1>
+  <p style="font-size:1.0625rem">Bases de marca para o sistema de gestão de academias — nome, slogan, logo, ícones, cores e temas. Alvo inicial: academias do Nordeste, tudo em português do Brasil, fuso <span class="num">America/Fortaleza</span>.</p>
+
+  <!-- ============ NOME ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">01 · o nome</p>
+      <h2>Pulso</h2>
+    </div>
+    <div class="grade g2">
+      <div>
+        <p>O produto tem três núcleos — <b>acesso</b> na catraca, <b>dinheiro</b> das mensalidades e <b>retenção</b> pela frequência. "Pulso" é a palavra que cobre os três sem esforço:</p>
+        <p><b>Batimento.</b> Cada passagem na catraca é uma batida. A academia tem um pulso mensurável, e é isso que o painel mostra.<br>
+        <b>Pulso firme.</b> Expressão corrente para gestão sob controle — o slogan sai do próprio nome.<br>
+        <b>Punho.</b> Onde se mede a pulsação e onde encosta a pulseira. Amarra o nome ao equipamento de acesso.</p>
+        <p>Duas sílabas, sem acento, sem dígrafo. Ao telefone, não precisa soletrar. E por não descrever o serviço, é marca <i>arbitrária</i> — a categoria mais forte para registrar.</p>
+      </div>
+      <div class="cartao">
+        <h3>Lista curta avaliada</h3>
+        <div class="rolagem">
+          <table>
+            <thead><tr><th>Nome</th><th>Leitura</th><th class="dir">Nota</th></tr></thead>
+            <tbody>
+              <tr><td><b>Pulso</b></td><td>batimento · gestão · punho</td><td class="dir num"><b>4,8</b></td></tr>
+              <tr><td>Giro</td><td>a catraca gira, o caixa gira</td><td class="dir num">3,9</td></tr>
+              <tr><td>Cadência</td><td>ritmo do treino e do caixa</td><td class="dir num">3,7</td></tr>
+              <tr><td>Farol</td><td>orientação, monitoramento</td><td class="dir num">3,6</td></tr>
+              <tr><td>Mandacaru</td><td>resistência do sertão</td><td class="dir num">3,5</td></tr>
+              <tr><td>Jangada</td><td>símbolo de Fortaleza</td><td class="dir num">3,4</td></tr>
+              <tr><td>Alísio</td><td>os ventos constantes</td><td class="dir num">3,3</td></tr>
+              <tr><td>Aurora</td><td>onde o sol nasce primeiro</td><td class="dir num">2,9</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="nota">Critérios: registrabilidade, clareza ao telefone, amplitude para expandir e encaixe no produto. Nada com sufixo <i>“fit”</i> entrou — Tecnofit, Next Fit, GoFit e FitSystem já ocupam esse padrão.</p>
+      </div>
+    </div>
+    <p class="nota"><b>Antes de fechar:</b> busca de anterioridade no INPI (classes 9 e 42) e registro de domínio. <span class="num">pulso.com.br</span> provavelmente está tomado — alternativas: <span class="num">usepulso.com.br</span>, <span class="num">pulsoacademias.com.br</span>, <span class="num">pulso.app</span>.</p>
+  </section>
+
+  <!-- ============ SLOGAN ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">02 · frase e slogans</p>
+      <h2>Um slogan por peça</h2>
+    </div>
+    <div class="cartao" style="margin-bottom:16px">
+      <p style="font-size:1.125rem;color:var(--texto);max-width:70ch;margin:0">Toda academia tem um pulso: gente entrando, treino acontecendo, dinheiro circulando. Quando esse pulso some do radar, o prejuízo aparece antes do dono perceber. O Pulso mede a batida — acesso por acesso, mensalidade por mensalidade — e avisa a tempo.</p>
+      <p class="legenda">Frase-conceito · uso interno, orienta produto e comunicação</p>
+    </div>
+    <div class="rolagem">
+      <table>
+        <thead><tr><th>Onde</th><th>Frase</th></tr></thead>
+        <tbody>
+          <tr><td class="sub">Site (principal)</td><td><b>O pulso da sua academia.</b></td></tr>
+          <tr><td class="sub">Comercial / proposta</td><td>Gestão com pulso firme.</td></tr>
+          <tr><td class="sub">Anúncio (dor)</td><td>Passe livre pro aluno. Pulso firme no caixa.</td></tr>
+          <tr><td class="sub">Redes sociais</td><td>Sua academia no ritmo certo.</td></tr>
+          <tr><td class="sub">Institucional</td><td>Feito no Nordeste, no ritmo da sua academia.</td></tr>
+          <tr><td class="sub">Assinatura do logo</td><td>gestão de academias</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ LOGO ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">03 · logo</p>
+      <h2>Cápsula, batida e subida</h2>
+    </div>
+    <p>O traçado entra na horizontal, dá a batida e <b>sai mais alto do que entrou</b>: batimento e crescimento na mesma linha. O logotipo é monolinear desenhado sob medida — mesma espessura e mesmas pontas arredondadas do símbolo. Não é fonte.</p>
+    <div class="grade g3" style="margin-top:20px">
+      <div>
+        <div class="tile tile-claro">
+          <svg viewBox="0 0 240 88" width="200" height="73" role="img" aria-label="Pulso, versão principal">
+            <rect x="0" y="8" width="72" height="72" rx="22" fill="#0A5673"/>
+            <path d="M 14 50 H 26 L 33 32 L 41 60 L 48 40 H 58" fill="none" stroke="#FFC64A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 92 28 V 60 M 92 28 H 103 A 9 9 0 0 1 103 46 H 92 M 120 28 V 47 A 13 13 0 0 0 146 47 V 28 M 154 28 V 60 H 170 M 194 36 A 8 8 0 1 0 186 44 A 8 8 0 1 1 178 52 M 202 44 A 16 16 0 1 1 234 44 A 16 16 0 1 1 202 44" fill="none" stroke="#103B4D" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="legenda">Principal — fundo claro</p>
+      </div>
+      <div>
+        <div class="tile tile-escuro">
+          <svg viewBox="0 0 240 88" width="200" height="73" role="img" aria-label="Pulso, versão para fundo escuro">
+            <path d="M 14 50 H 26 L 33 32 L 41 60 L 48 40 H 58" fill="none" stroke="#FFC64A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 92 28 V 60 M 92 28 H 103 A 9 9 0 0 1 103 46 H 92 M 120 28 V 47 A 13 13 0 0 0 146 47 V 28 M 154 28 V 60 H 170 M 194 36 A 8 8 0 1 0 186 44 A 8 8 0 1 1 178 52 M 202 44 A 16 16 0 1 1 234 44 A 16 16 0 1 1 202 44" fill="none" stroke="#E8F0F2" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="legenda">Fundo escuro — sem cápsula</p>
+      </div>
+      <div>
+        <div class="tile tile-sol">
+          <svg viewBox="0 0 240 88" width="200" height="73" role="img" aria-label="Pulso, aplicação sobre a cor secundária">
+            <rect x="0" y="8" width="72" height="72" rx="22" fill="#0A5673"/>
+            <path d="M 14 50 H 26 L 33 32 L 41 60 L 48 40 H 58" fill="none" stroke="#FFC64A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 92 28 V 60 M 92 28 H 103 A 9 9 0 0 1 103 46 H 92 M 120 28 V 47 A 13 13 0 0 0 146 47 V 28 M 154 28 V 60 H 170 M 194 36 A 8 8 0 1 0 186 44 A 8 8 0 1 1 178 52 M 202 44 A 16 16 0 1 1 234 44 A 16 16 0 1 1 202 44" fill="none" stroke="#103B4D" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="legenda">Sobre a cor secundária</p>
+      </div>
+    </div>
+
+    <div class="grade g2" style="margin-top:24px">
+      <div class="cartao">
+        <h3>Símbolo e redução</h3>
+        <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap">
+          <svg viewBox="0 8 72 72" width="72" height="72" role="img" aria-label="Símbolo Pulso">
+            <rect x="0" y="8" width="72" height="72" rx="22" fill="#0A5673"/>
+            <path d="M 14 50 H 26 L 33 32 L 41 60 L 48 40 H 58" fill="none" stroke="#FFC64A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg viewBox="0 8 72 72" width="32" height="32" role="img" aria-label="Símbolo reduzido, 32 pixels">
+            <rect x="0" y="8" width="72" height="72" rx="20" fill="#0A5673"/>
+            <path d="M 15 50 L 29 50 L 37 28 L 45 58 L 57 40" fill="none" stroke="#FFC64A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg viewBox="0 8 72 72" width="16" height="16" role="img" aria-label="Símbolo reduzido, 16 pixels">
+            <rect x="0" y="8" width="72" height="72" rx="20" fill="#0A5673"/>
+            <path d="M 15 50 L 29 50 L 37 28 L 45 58 L 57 40" fill="none" stroke="#FFC64A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="legenda">A partir de 24 px o traçado troca por uma versão simplificada e mais grossa — o desenho completo empasta no favicon.</p>
+      </div>
+      <div class="cartao">
+        <h3>Display da catraca</h3>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:10px">
+            <svg viewBox="0 0 96 96" width="52" height="52" role="img" aria-label="Acesso liberado">
+              <circle cx="48" cy="48" r="46" fill="#127A4F"/>
+              <path d="M 28 49 L 42 63 L 69 34" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <b style="font-size:.9375rem">Pode passar</b>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <svg viewBox="0 0 96 96" width="52" height="52" role="img" aria-label="Acesso bloqueado">
+              <circle cx="48" cy="48" r="46" fill="#C42A1E"/>
+              <path d="M 33 33 L 63 63 M 63 33 L 33 63" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <b style="font-size:.9375rem">Procure a recepção</b>
+          </div>
+        </div>
+        <p class="legenda">Forma antes de cor — é lido em movimento, a mais de um metro. E acesso negado <b>nunca</b> mostra o motivo na fila: não se expõe o aluno.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CORES ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">04 · cores</p>
+      <h2>Mar e sol, calibrados para painel financeiro</h2>
+    </div>
+    <p>O par é o Nordeste sem clichê. O azul carrega confiança e sustenta texto branco; o amarelo dá o calor que os concorrentes, quase todos frios, não têm.</p>
+    <div class="grade g2" style="margin-top:20px">
+      <div class="swatch-grande" style="background:#0A6B8C;color:#fff">
+        <b>Azul Maré · primária</b>
+        <span class="num">#0A6B8C — ações, links, navegação ativa</span>
+      </div>
+      <div class="swatch-grande" style="background:#FAB01B;color:#3D2A00">
+        <b>Amarelo Sol · secundária</b>
+        <span class="num">#FAB01B — energia da marca, destaques, atenção</span>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <p class="eyebrow" style="margin-bottom:6px">Azul Maré 50 → 950</p>
+      <div class="rampa">
+        <div style="background:#ECF7FB"></div><div style="background:#D3EDF6"></div><div style="background:#A6DAEC"></div>
+        <div style="background:#6DC0DC"></div><div style="background:#35A2C4"></div><div style="background:#1385A9"></div>
+        <div style="background:#0A6B8C"></div><div style="background:#0A5673"></div><div style="background:#0D475D"></div>
+        <div style="background:#103B4D"></div><div style="background:#07222E"></div>
+      </div>
+      <div class="rampa-rot num"><span>50</span><span>600 · ação</span><span>950</span></div>
+    </div>
+    <div style="margin-top:16px">
+      <p class="eyebrow" style="margin-bottom:6px">Amarelo Sol 50 → 900</p>
+      <div class="rampa">
+        <div style="background:#FFF8E8"></div><div style="background:#FFEDC2"></div><div style="background:#FFDA85"></div>
+        <div style="background:#FFC64A"></div><div style="background:#FAB01B"></div><div style="background:#E09600"></div>
+        <div style="background:#C77400"></div><div style="background:#A66A00"></div><div style="background:#8F5C00"></div>
+        <div style="background:#70470A"></div>
+      </div>
+      <div class="rampa-rot num"><span>50</span><span>400 · marca</span><span>900</span></div>
+    </div>
+    <div style="margin-top:16px">
+      <p class="eyebrow" style="margin-bottom:6px">Neutros Areia Fria — cinza puro ao lado do Maré parece sujo</p>
+      <div class="rampa">
+        <div style="background:#FFFFFF"></div><div style="background:#F6F9FA"></div><div style="background:#EDF2F4"></div>
+        <div style="background:#DEE7EA"></div><div style="background:#C6D2D7"></div><div style="background:#97A8AF"></div>
+        <div style="background:#6D8189"></div><div style="background:#5F7279"></div><div style="background:#45565E"></div>
+        <div style="background:#2B383F"></div><div style="background:#1A252B"></div><div style="background:#0D171C"></div>
+      </div>
+      <div class="rampa-rot num"><span>0</span><span>600 · texto secundário</span><span>950</span></div>
+    </div>
+
+    <h3 style="margin-top:32px">Estados financeiros</h3>
+    <p>Nunca só cor: <b>ícone + texto + cor</b>, sempre os três.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+      <span class="chip c-pago"><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Paga</span>
+      <span class="chip c-avencer"><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 4.6 V8.4 L10.6 9.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>A vencer</span>
+      <span class="chip c-vencido"><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.4 L14.4 13.6 H1.6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 6.6 V9.4 M8 11.4 v.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Vencida</span>
+      <span class="chip c-freq"><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.6 V13 M4 9 L8 13 L12 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Baixa frequência</span>
+    </div>
+    <p class="nota">Baixa frequência ganhou <b>roxo</b> de propósito: é risco de evasão, não problema de caixa. Misturar com o vermelho da inadimplência faria a gestão tratar as duas coisas do mesmo jeito.</p>
+
+    <div class="cartao" style="margin-top:24px">
+      <h3>Contraste verificado, não estimado</h3>
+      <p style="margin-bottom:0">Todos os pares foram calculados nos dois temas: texto e ações em <b class="num">≥ 4,5:1</b> (menor valor medido: <span class="num">4,76:1</span>), contornos de campo e anel de foco em <b class="num">≥ 3:1</b>. A paleta de gráficos passou nos testes de banda de luminosidade, saturação mínima, contraste contra a superfície e separação para <b>deuteranopia, protanopia e tritanopia</b>.</p>
+    </div>
+  </section>
+
+  <!-- ============ TEMAS ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">05 · temas</p>
+      <h2>Claro e escuro, os dois oficiais</h2>
+    </div>
+    <div class="grade g2">
+      <div>
+        <p>O <b>claro</b> é o padrão da recepção: tela iluminada, uso o dia inteiro. O <b>escuro</b> serve à consulta no celular à noite e ao terminal da catraca em sala de pouca luz.</p>
+        <p>São <b>três estados</b>, não dois: claro explícito, escuro explícito e o padrão “sistema”, que não marca nada no HTML e só se resolve por <span class="num">prefers-color-scheme</span>. O escuro não é inversão do claro — as superfícies têm viés azul-esverdeado e as cores de ação e estado foram reescolhidas uma a uma.</p>
+        <p class="sub" style="font-size:.875rem">Use o botão no topo para conferir esta página nos dois.</p>
+      </div>
+      <div class="cartao">
+        <div class="rolagem">
+          <table>
+            <thead><tr><th>Token</th><th>Claro</th><th>Escuro</th></tr></thead>
+            <tbody class="num">
+              <tr><td>fundo</td><td>#F6F9FA</td><td>#0B1519</td></tr>
+              <tr><td>superfície</td><td>#FFFFFF</td><td>#101F25</td></tr>
+              <tr><td>borda</td><td>#DEE7EA</td><td>#26424B</td></tr>
+              <tr><td>texto</td><td>#1A252B</td><td>#E8F0F2</td></tr>
+              <tr><td>texto mudo</td><td>#5F7279</td><td>#9CB2BA</td></tr>
+              <tr><td>ação</td><td>#0A6B8C</td><td>#6DC0DC</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ UI ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">06 · amostra de interface</p>
+      <h2>Radar — a tela que abre primeiro no celular</h2>
+    </div>
+    <p>Resumo antes do detalhe: quanto entrou, quanto vence, quanto venceu, quem sumiu. Valores em numeral tabular, alvo de toque de 44 px, navegação no rodapé para alcance do polegar.</p>
+
+    <div class="cartao" style="margin-top:20px">
+      <div class="grade g4">
+        <div class="kpi">
+          <div class="rot">Recebido em agosto</div>
+          <div class="val num">R$ 48.320</div>
+          <div class="det num">312 mensalidades</div>
+        </div>
+        <div class="kpi">
+          <div class="rot">Vence em 7 dias</div>
+          <div class="val num">R$ 9.140</div>
+          <div class="det"><span class="chip c-avencer" style="font-size:.6875rem;padding:2px 8px">58 alunos</span></div>
+        </div>
+        <div class="kpi">
+          <div class="rot">Vencidas</div>
+          <div class="val num" style="color:var(--vencido-t)">R$ 3.880</div>
+          <div class="det"><span class="chip c-vencido" style="font-size:.6875rem;padding:2px 8px">14 alunos</span></div>
+        </div>
+        <div class="kpi">
+          <div class="rot">Sumiram há 15+ dias</div>
+          <div class="val num">23</div>
+          <div class="det"><span class="chip c-freq" style="font-size:.6875rem;padding:2px 8px">risco de evasão</span></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:28px">Mensalidades a resolver</h3>
+      <div class="lista-aluno">
+        <div><div class="aluno-nome">Antônia Régia Nogueira</div><div class="aluno-det num">Plano Mensal · venceu 08/08</div></div>
+        <div style="text-align:right"><div class="num" style="font-weight:700">R$ 129,90</div><span class="chip c-vencido" style="font-size:.6875rem;padding:2px 8px;margin-top:4px">7 dias</span></div>
+      </div>
+      <div class="lista-aluno">
+        <div><div class="aluno-nome">José Wanderley da Costa</div><div class="aluno-det num">Plano Trimestral · vence 17/08</div></div>
+        <div style="text-align:right"><div class="num" style="font-weight:700">R$ 319,00</div><span class="chip c-avencer" style="font-size:.6875rem;padding:2px 8px;margin-top:4px">em 2 dias</span></div>
+      </div>
+      <div class="lista-aluno">
+        <div><div class="aluno-nome">Maria Eduarda Sampaio</div><div class="aluno-det num">Plano Anual · pago 05/08 via Pix</div></div>
+        <div style="text-align:right"><div class="num" style="font-weight:700">R$ 1.188,00</div><span class="chip c-pago" style="font-size:.6875rem;padding:2px 8px;margin-top:4px">em dia</span></div>
+      </div>
+
+      <h3 style="margin-top:28px">Movimento na catraca — média por horário</h3>
+      <div class="faixa" role="img" aria-label="Mapa de calor: movimento maior entre 17h e 20h, pico às 19h">
+        <div style="background:var(--seq-1)" title="6h · 18 acessos"></div>
+        <div style="background:var(--seq-2)" title="8h · 41 acessos"></div>
+        <div style="background:var(--seq-1)" title="10h · 22 acessos"></div>
+        <div style="background:var(--seq-1)" title="12h · 27 acessos"></div>
+        <div style="background:var(--seq-2)" title="14h · 35 acessos"></div>
+        <div style="background:var(--seq-3)" title="16h · 63 acessos"></div>
+        <div style="background:var(--seq-5)" title="18h · 104 acessos"></div>
+        <div style="background:var(--seq-6)" title="19h · 128 acessos"></div>
+        <div style="background:var(--seq-4)" title="20h · 88 acessos"></div>
+        <div style="background:var(--seq-1)" title="22h · 19 acessos"></div>
+      </div>
+      <div class="faixa-rot num"><span>6h</span><span>8h</span><span>10h</span><span>12h</span><span>14h</span><span>16h</span><span>18h</span><span>19h</span><span>20h</span><span>22h</span></div>
+      <div class="legenda-seq">
+        menos
+        <i style="background:var(--seq-1)"></i><i style="background:var(--seq-2)"></i><i style="background:var(--seq-3)"></i><i style="background:var(--seq-4)"></i><i style="background:var(--seq-5)"></i><i style="background:var(--seq-6)"></i>
+        mais movimento
+      </div>
+      <p class="legenda">Dados fictícios, só para demonstrar a paleta aplicada.</p>
+    </div>
+  </section>
+
+  <!-- ============ TIPOGRAFIA ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">07 · tipografia</p>
+      <h2>Sora nos títulos, Inter no resto</h2>
+    </div>
+    <div class="grade g2">
+      <div>
+        <p><b>Sora</b> nos títulos: geométrica, ecoa o monolinear do logotipo. <b>Inter</b> na interface, pelo desempenho em tela pequena. Números <b>sempre</b> com <span class="num">tabular-nums</span> — valor, data e contagem precisam alinhar em coluna.</p>
+        <p>As duas são de licença aberta (SIL OFL). <b>Auto-hospede</b>: a academia pode estar em conexão instável, e o painel não pode cair para fonte de sistema no meio do expediente.</p>
+      </div>
+      <div class="cartao">
+        <div style="font-size:2rem;font-weight:700;letter-spacing:-.02em;line-height:1.15">Mensalidades</div>
+        <div style="font-size:1.375rem;font-weight:600;margin-top:8px">Radar da academia</div>
+        <div style="margin-top:8px;color:var(--texto-2)">Texto corrido da interface, no tamanho base de 16 px, com entrelinha folgada para leitura no celular.</div>
+        <div class="num" style="margin-top:12px;font-size:1.5rem;font-weight:700">R$ 1.188,00 · 17/08/2026</div>
+        <p class="legenda">Amostra composta em fonte do sistema — esta página não carrega fontes externas. No produto, aplicar Sora e Inter.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRÓXIMOS PASSOS ============ -->
+  <section>
+    <div class="cabecalho-secao">
+      <p class="eyebrow">08 · próximos passos</p>
+      <h2>O que fazer antes de aplicar a marca</h2>
+    </div>
+    <ol class="passos">
+      <li><b>Registrar.</b> Busca de anterioridade no INPI (classes 9 e 42) e registro dos domínios — antes de qualquer aplicação da marca.</li>
+      <li><b>Fechar o vetor.</b> Logotipo com traçados expandidos em arquivo editável e manual de aplicação.</li>
+      <li><b>Prototipar Radar e ficha do aluno</b> nos dois temas, e testar com uma recepcionista de verdade, no celular dela.</li>
+      <li><b>Definir a integração de acesso.</b> Equipamentos com API/SDK documentados (Control iD iDFace, Topdata, Henry, Intelbras) e o modelo de sincronização de templates biométricos.</li>
+      <li><b>Cadastrar os modelos de WhatsApp</b> para aprovação — o prazo entra no cronograma de lançamento.</li>
+      <li><b>Biometria é dado sensível (LGPD, art. 11).</b> Consentimento específico e separado, alternativa obrigatória por cartão ou PIN, exclusão ao cancelar a matrícula. Guardar template, nunca a imagem do rosto.</li>
+    </ol>
+  </section>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('tema');
+    var raiz = document.documentElement;
+    function escuroAgora() {
+      var t = raiz.getAttribute('data-theme');
+      if (t) return t === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function rotular() {
+      btn.textContent = escuroAgora() ? 'Ver no tema claro' : 'Ver no tema escuro';
+    }
+    btn.addEventListener('click', function () {
+      raiz.setAttribute('data-theme', escuroAgora() ? 'light' : 'dark');
+      rotular();
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', rotular);
+    rotular();
+  })();
+</script>

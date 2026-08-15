@@ -1,0 +1,229 @@
+/* =============================================================
+   PULSO — tokens de design
+   Gestão de academias · pt-BR · America/Fortaleza
+   -------------------------------------------------------------
+   Todos os pares de cor foram verificados contra a WCAG 2.1 AA
+   (texto >= 4.5:1, contorno de controle >= 3:1) e a paleta de
+   gráficos foi validada para deuteranopia/protanopia/tritanopia.
+   Ao alterar qualquer valor, revalide antes de subir.
+   ============================================================= */
+
+:root {
+  /* ---------- rampa: Azul Maré (primária) ---------- */
+  --mare-50:  #ECF7FB;
+  --mare-100: #D3EDF6;
+  --mare-200: #A6DAEC;
+  --mare-300: #6DC0DC;
+  --mare-400: #35A2C4;
+  --mare-500: #1385A9;
+  --mare-600: #0A6B8C;
+  --mare-700: #0A5673;
+  --mare-800: #0D475D;
+  --mare-900: #103B4D;
+  --mare-950: #07222E;
+
+  /* ---------- rampa: Amarelo Sol (secundária) ---------- */
+  --sol-50:  #FFF8E8;
+  --sol-100: #FFEDC2;
+  --sol-200: #FFDA85;
+  --sol-300: #FFC64A;
+  --sol-400: #FAB01B;
+  --sol-500: #E09600;
+  --sol-600: #C77400;
+  --sol-700: #A66A00;
+  --sol-800: #8F5C00;
+  --sol-900: #70470A;
+
+  /* ---------- rampa: neutros Areia Fria ---------- */
+  --areia-0:   #FFFFFF;
+  --areia-50:  #F6F9FA;
+  --areia-100: #EDF2F4;
+  --areia-200: #DEE7EA;
+  --areia-300: #C6D2D7;
+  --areia-400: #97A8AF;
+  --areia-500: #6D8189;
+  --areia-600: #5F7279;
+  --areia-700: #45565E;
+  --areia-800: #2B383F;
+  --areia-900: #1A252B;
+  --areia-950: #0D171C;
+
+  /* ---------- rampas de estado ---------- */
+  --verde-600: #127A4F;  --verde-400: #3DD68C;
+  --brasa-600: #C42A1E;  --brasa-400: #FF7A6B;
+  --roxo-600:  #6B4FD6;  --roxo-400:  #A996FF;
+
+  /* ---------- tipografia ---------- */
+  --fonte-titulo: "Sora", "Segoe UI", system-ui, sans-serif;
+  --fonte-texto:  "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fonte-numero: "Inter", system-ui, sans-serif; /* usar com tabular-nums */
+
+  /* escala tipográfica (base 16px, razão 1.25) */
+  --txt-xs: 0.75rem;   --txt-sm: 0.875rem;  --txt-base: 1rem;
+  --txt-lg: 1.125rem;  --txt-xl: 1.375rem;  --txt-2xl: 1.75rem;
+  --txt-3xl: 2.125rem; --txt-4xl: 2.75rem;
+
+  /* ---------- espaçamento (base 4px) ---------- */
+  --e-1: 0.25rem; --e-2: 0.5rem;  --e-3: 0.75rem; --e-4: 1rem;
+  --e-5: 1.5rem;  --e-6: 2rem;    --e-7: 3rem;    --e-8: 4rem;
+
+  /* ---------- raios (ecoam a cápsula do símbolo, ~30%) ---------- */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 22px; --r-pill: 999px;
+
+  /* ---------- elevação ---------- */
+  --sombra-1: 0 1px 2px rgb(13 23 28 / 0.06), 0 1px 3px rgb(13 23 28 / 0.08);
+  --sombra-2: 0 4px 12px rgb(13 23 28 / 0.10);
+  --sombra-3: 0 12px 32px rgb(13 23 28 / 0.14);
+
+  /* alvo mínimo de toque — a equipe usa o sistema no celular */
+  --alvo-toque: 44px;
+
+  /* =========================================================
+     TEMA CLARO (padrão)
+     ========================================================= */
+  --cor-fundo:        var(--areia-50);
+  --cor-superficie:   var(--areia-0);
+  --cor-superficie-2: var(--areia-100);
+  --cor-borda:        var(--areia-200);
+  --cor-borda-forte:  var(--areia-500);   /* contorno de campo/controle — 4.08:1 */
+
+  --cor-texto:      var(--areia-900);     /* 15.63:1 */
+  --cor-texto-2:    var(--areia-700);     /*  8.14:1 */
+  --cor-texto-mudo: var(--areia-600);     /*  5.04:1 */
+
+  --cor-acao:       var(--mare-600);      /*  6.01:1 sobre branco */
+  --cor-acao-hover: var(--mare-700);
+  --cor-acao-texto: #FFFFFF;              /*  6.01:1 sobre a ação */
+  --cor-acao-sutil: var(--mare-50);
+  --cor-foco:       var(--mare-500);      /*  4.24:1 — anel de foco */
+
+  --cor-marca:       var(--mare-700);
+  --cor-marca-sol:   var(--sol-300);
+
+  /* estados financeiros — sempre com ícone + texto, nunca só cor */
+  --pago-texto: #0B5C3B; --pago-fundo: #E7F6EE; --pago-borda: #BCE5CE; --pago-forte: var(--verde-600);
+  --avencer-texto: #7A4E00; --avencer-fundo: #FFF3D6; --avencer-borda: #F5DFA8; --avencer-forte: var(--sol-600);
+  --vencido-texto: #93211A; --vencido-fundo: #FDEAE7; --vencido-borda: #F7C9C2; --vencido-forte: var(--brasa-600);
+  --freq-texto: #4B33A8; --freq-fundo: #EFEBFD; --freq-borda: #D8CFFA; --freq-forte: var(--roxo-600);
+
+  /* série categórica para gráficos — ordem fixa, nunca reciclada */
+  --graf-1: #1290BC; --graf-2: #C77400; --graf-3: #7A5AF8;
+  --graf-4: #2E9E5B; --graf-5: #3B4EA0; --graf-6: #C2417A;
+  --graf-grade: var(--areia-200);
+
+  /* rampa sequencial (mapa de calor: frequência por horário/dia) */
+  --seq-1: #6DC0DC; --seq-2: #35A2C4; --seq-3: #1385A9;
+  --seq-4: #0A6B8C; --seq-5: #0A5673; --seq-6: #103B4D;
+
+  color-scheme: light;
+}
+
+/* =========================================================
+   TEMA ESCURO
+   Redefine só os tokens. O guard :not([data-theme="light"])
+   faz a escolha explícita do usuário vencer o tema do sistema.
+   ========================================================= */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cor-fundo:        #0B1519;
+    --cor-superficie:   #101F25;
+    --cor-superficie-2: #16282F;
+    --cor-borda:        #26424B;
+    --cor-borda-forte:  #557D87;          /* 3.75:1 */
+
+    --cor-texto:      #E8F0F2;            /* 14.60:1 */
+    --cor-texto-2:    #C2D3D9;            /* 10.72:1 */
+    --cor-texto-mudo: #9CB2BA;            /*  7.62:1 */
+
+    --cor-acao:       var(--mare-300);    /*  8.21:1 */
+    --cor-acao-hover: var(--mare-200);
+    --cor-acao-texto: var(--mare-950);    /*  8.00:1 sobre a ação */
+    --cor-acao-sutil: #0E2E3A;
+    --cor-foco:       var(--mare-300);
+
+    --cor-marca:      var(--areia-0);
+    --cor-marca-sol:  var(--sol-300);
+
+    --pago-texto: #7BE8B4; --pago-fundo: #0D2A1E; --pago-borda: #1B4633; --pago-forte: var(--verde-400);
+    --avencer-texto: #FFD07A; --avencer-fundo: #2E2008; --avencer-borda: #4D3A12; --avencer-forte: var(--sol-400);
+    --vencido-texto: #FFB3A8; --vencido-fundo: #2E1512; --vencido-borda: #57241E; --vencido-forte: var(--brasa-400);
+    --freq-texto: #C9BCFF; --freq-fundo: #1E1840; --freq-borda: #332B63; --freq-forte: var(--roxo-400);
+
+    --graf-1: #2A96C0; --graf-2: #C58514; --graf-3: #7E67DE;
+    --graf-4: #269960; --graf-5: #6274CE; --graf-6: #CE4A80;
+    --graf-grade: #26424B;
+
+    --seq-1: #0A5673; --seq-2: #0A6B8C; --seq-3: #1385A9;
+    --seq-4: #35A2C4; --seq-5: #6DC0DC; --seq-6: #A6DAEC;
+
+    --sombra-1: 0 1px 2px rgb(0 0 0 / 0.40);
+    --sombra-2: 0 4px 12px rgb(0 0 0 / 0.45);
+    --sombra-3: 0 12px 32px rgb(0 0 0 / 0.55);
+
+    color-scheme: dark;
+  }
+}
+
+/* Escolha explícita "escuro" — vence o tema claro do sistema. */
+:root[data-theme="dark"] {
+  --cor-fundo:        #0B1519;
+  --cor-superficie:   #101F25;
+  --cor-superficie-2: #16282F;
+  --cor-borda:        #26424B;
+  --cor-borda-forte:  #557D87;
+
+  --cor-texto:      #E8F0F2;
+  --cor-texto-2:    #C2D3D9;
+  --cor-texto-mudo: #9CB2BA;
+
+  --cor-acao:       var(--mare-300);
+  --cor-acao-hover: var(--mare-200);
+  --cor-acao-texto: var(--mare-950);
+  --cor-acao-sutil: #0E2E3A;
+  --cor-foco:       var(--mare-300);
+
+  --cor-marca:      var(--areia-0);
+  --cor-marca-sol:  var(--sol-300);
+
+  --pago-texto: #7BE8B4; --pago-fundo: #0D2A1E; --pago-borda: #1B4633; --pago-forte: var(--verde-400);
+  --avencer-texto: #FFD07A; --avencer-fundo: #2E2008; --avencer-borda: #4D3A12; --avencer-forte: var(--sol-400);
+  --vencido-texto: #FFB3A8; --vencido-fundo: #2E1512; --vencido-borda: #57241E; --vencido-forte: var(--brasa-400);
+  --freq-texto: #C9BCFF; --freq-fundo: #1E1840; --freq-borda: #332B63; --freq-forte: var(--roxo-400);
+
+  --graf-1: #2A96C0; --graf-2: #C58514; --graf-3: #7E67DE;
+  --graf-4: #269960; --graf-5: #6274CE; --graf-6: #CE4A80;
+  --graf-grade: #26424B;
+
+  --seq-1: #0A5673; --seq-2: #0A6B8C; --seq-3: #1385A9;
+  --seq-4: #35A2C4; --seq-5: #6DC0DC; --seq-6: #A6DAEC;
+
+  --sombra-1: 0 1px 2px rgb(0 0 0 / 0.40);
+  --sombra-2: 0 4px 12px rgb(0 0 0 / 0.45);
+  --sombra-3: 0 12px 32px rgb(0 0 0 / 0.55);
+
+  color-scheme: dark;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+body {
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family: var(--fonte-texto);
+}
+
+/* Dinheiro, datas e contagens alinham em coluna. */
+.numero, td.numero, .valor {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--cor-foco);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
