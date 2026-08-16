@@ -122,6 +122,89 @@ final class Matricula extends Model
         return $competencia->startOfMonth()->addDays($this->dia_vencimento - 1);
     }
 
+    // ---------------------------------------------------------------------
+    // Transições
+    //
+    // Cada uma confere de onde se está saindo. Sem isso, um duplo clique ou um
+    // link antigo faria a matrícula pular de "encerrada" para "ativa" sem
+    // ninguém perceber.
+    // ---------------------------------------------------------------------
+
+    /**
+     * Converte a experiência em matrícula de verdade.
+     *
+     * O contrato assinado é exigência do banco também (constraint
+     * `matriculas_regular_exige_contrato`): matrícula regular sem contrato não
+     * entra por caminho nenhum.
+     *
+     * A vigência recomeça na conversão — o período de teste acabou, e é a
+     * partir daqui que se conta o prazo do plano.
+     */
+    public function converterParaRegular(CarbonImmutable $contratoAssinadoEm, int $diaVencimento): void
+    {
+        $hoje = CarbonImmutable::now()->startOfDay();
+
+        $this->update([
+            'tipo' => TipoMatricula::Regular,
+            'situacao' => SituacaoMatricula::Ativa,
+            'contrato_assinado_em' => $contratoAssinadoEm,
+            'dia_vencimento' => $diaVencimento,
+            'inicio_em' => $hoje,
+            'fim_previsto_em' => $this->plano->duracao_meses > 1
+                ? $hoje->addMonths($this->plano->duracao_meses)
+                : null,
+        ]);
+    }
+
+    /** Trancou: não passa na catraca e não gera mensalidade. */
+    public function suspender(): void
+    {
+        $this->update(['situacao' => SituacaoMatricula::Suspensa]);
+    }
+
+    public function reativar(): void
+    {
+        $this->update([
+            'situacao' => $this->tipo === TipoMatricula::Experiencia
+                ? SituacaoMatricula::Experiencia
+                : SituacaoMatricula::Ativa,
+        ]);
+    }
+
+    public function encerrar(?string $motivo = null): void
+    {
+        $this->update([
+            'situacao' => SituacaoMatricula::Encerrada,
+            'encerrada_em' => CarbonImmutable::now()->startOfDay(),
+            'motivo_encerramento' => $motivo,
+        ]);
+    }
+
+    public function podeSerConvertida(): bool
+    {
+        return $this->tipo === TipoMatricula::Experiencia
+            && $this->situacao === SituacaoMatricula::Experiencia;
+    }
+
+    public function podeSerSuspensa(): bool
+    {
+        return $this->situacao === SituacaoMatricula::Ativa;
+    }
+
+    public function podeSerReativada(): bool
+    {
+        return $this->situacao === SituacaoMatricula::Suspensa;
+    }
+
+    public function podeSerEncerrada(): bool
+    {
+        return in_array($this->situacao, [
+            SituacaoMatricula::Ativa,
+            SituacaoMatricula::Experiencia,
+            SituacaoMatricula::Suspensa,
+        ], true);
+    }
+
     /**
      * @param  Builder<Matricula>  $consulta
      * @return Builder<Matricula>

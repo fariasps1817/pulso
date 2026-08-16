@@ -174,8 +174,9 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 2b. Design system — 27 componentes e o catálogo em `/catalogo` | ✅ concluída |
 | 2c. Banco: 26 migrations, 16 models e Row Level Security | ✅ concluída |
 | 3a. CRUD de alunos (Livewire) — lista, ficha e formulário | ✅ concluída |
-| 3b. CRUD de planos e matrículas | ⬜ próxima |
-| 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ |
+| 3b. CRUD de planos | ✅ concluída |
+| 3c. Matrículas — criação, experiência, conversão, trancamento e encerramento | ✅ concluída |
+| 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ próxima |
 | 5. Controle de acesso: catraca e biometria | ⬜ |
 | 6. Radar | ⬜ |
 | 7. Notificações por WhatsApp | ⬜ |

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\PreferenciaController;
 use App\Http\Controllers\UnidadeAtualController;
 use App\Livewire\Alunos;
+use App\Livewire\Matriculas;
 use App\Livewire\Planos;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,12 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('/novo', Alunos\Formulario::class)->name('novo');
         Route::get('/{aluno}', Alunos\Detalhes::class)->name('detalhes');
         Route::get('/{aluno}/editar', Alunos\Formulario::class)->name('editar');
+    });
+
+    Route::prefix('matriculas')->name('matriculas.')->group(function (): void {
+        Route::get('/', Matriculas\Lista::class)->name('lista');
+        Route::get('/nova', Matriculas\Formulario::class)->name('nova');
+        Route::get('/{matricula}', Matriculas\Detalhes::class)->name('detalhes');
     });
 
     Route::prefix('planos')->name('planos.')->group(function (): void {

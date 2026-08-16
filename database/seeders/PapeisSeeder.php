@@ -70,8 +70,13 @@ final class PapeisSeeder extends Seeder
 
         'professor' => [
             'aluno.ver',
+            'matricula.ver',
             'frequencia.ver',
-            // Nada de dinheiro. Nem valor de plano.
+            /*
+             * Vê a matrícula para saber se o aluno está em dia com o cadastro
+             * e em qual plano — mas SEM `mensalidade.ver`, que é o que libera
+             * os valores na tela. Professor não vê dinheiro.
+             */
         ],
     ];
 

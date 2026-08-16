@@ -20,7 +20,7 @@
     $itens = [
         ['id' => 'radar', 'rotulo' => 'Radar', 'icone' => 'M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm0 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm0 3v.01', 'principal' => true, 'url' => route('painel.inicio')],
         ['id' => 'alunos', 'rotulo' => 'Alunos', 'icone' => 'M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7a6 6 0 0 1 12 0', 'principal' => true, 'url' => route('alunos.lista')],
-        ['id' => 'matriculas', 'rotulo' => 'Matrículas', 'icone' => 'M5 3h10v14l-5-3-5 3V3Z', 'principal' => false],
+        ['id' => 'matriculas', 'rotulo' => 'Matrículas', 'icone' => 'M5 3h10v14l-5-3-5 3V3Z', 'principal' => false, 'url' => route('matriculas.lista')],
         ['id' => 'mensalidades', 'rotulo' => 'Mensalidades', 'icone' => 'M2.5 6.5h15v9h-15v-9Zm0 3.5h15M5.5 13h3', 'principal' => true],
         ['id' => 'planos', 'rotulo' => 'Planos', 'icone' => 'M3.5 5.5h13M3.5 10h13M3.5 14.5h8', 'principal' => false, 'url' => route('planos.lista')],
         ['id' => 'acesso', 'rotulo' => 'Acesso', 'icone' => 'M6.5 3h-3v3M13.5 3h3v3M6.5 17h-3v-3M13.5 17h3v-3M7.5 8v1M12.5 8v1M7.5 12.5s1 1 2.5 1 2.5-1 2.5-1', 'principal' => true],
