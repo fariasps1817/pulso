@@ -56,7 +56,10 @@ final class DemonstracaoSeeder extends Seeder
         ]);
 
         $this->command->info('Academias: Alpha Fit (3 unidades) e Corpo em Movimento (1 unidade).');
-        $this->command->info('Acesso: dono@alphafit.com.br / pulso1234');
+        $this->command->newLine();
+        $this->command->info('Dono da academia .... dono@alpha-fit.com.br / pulso1234');
+        $this->command->info('Recepção ............ recepcao@alpha-fit.com.br / pulso1234');
+        $this->command->info('Equipe do Pulso ..... suporte@usepulso.com.br / pulso1234');
     }
 
     private function criarAcademia(string $nome, string $cidade, bool $comFiliais): Academia

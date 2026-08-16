@@ -137,7 +137,15 @@ php artisan db:seed --database=pgsql_admin  # duas academias de demonstração
 
 Migrations e seeders **não** rodam pela conexão padrão: `pulso_app` não tem permissão de criar tabela e está sujeito ao RLS — e é exatamente isso que faz o isolamento valer.
 
-Acesso de demonstração: `dono@alpha-fit.com.br` / `pulso1234`.
+Acessos de demonstração, todos com a senha `pulso1234`:
+
+| Quem | E-mail | Cai em |
+|---|---|---|
+| Dono da academia | `dono@alpha-fit.com.br` | `/painel` (Radar) |
+| Recepção | `recepcao@alpha-fit.com.br` | `/painel` (Radar) |
+| Equipe do Pulso | `suporte@usepulso.com.br` | `/administracao/academias` |
+
+O último não pertence a academia nenhuma — é o super administrador. O destino de cada um é decidido pelo middleware, não pela tela de login.
 
 > **No Laragon**, o `pg_hba.conf` vem com método `trust` — qualquer conexão local é aceita sem senha. É aceitável numa máquina de desenvolvimento. **Na VPS, use `scram-sha-256`** e senha forte, e não exponha a porta 5432 para fora.
 
