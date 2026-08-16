@@ -74,6 +74,8 @@ CREATE POLICY isolamento_academia ON alunos
 DB::statement("SELECT set_config('pulso.academia_id', ?, false)", [$user->academia_id]);
 ```
 
+**A ordem do middleware importa.** `DefinirAcademiaAtual` precisa rodar **antes** do `SubstituteBindings` do Laravel: é o `SubstituteBindings` que transforma `/alunos/1` no model, e essa busca já passa pelo RLS. Com a academia ainda indefinida, o banco devolve zero linhas e a tela vira 404 — para um aluno que existe e pertence a quem está logado. Garantido em `bootstrap/app.php` e coberto por teste.
+
 Três detalhes que decidem se isso funciona ou vira enfeite:
 
 1. **`FORCE ROW LEVEL SECURITY`** — sem isso, o dono da tabela ignora a política. Como as migrations rodam por `pgsql_admin`, o dono seria justamente quem escapa.

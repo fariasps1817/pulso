@@ -12,11 +12,7 @@
         {{-- ==================== Dados pessoais ==================== --}}
         <x-ui.cartao>
             <h2 class="text-lg text-texto">Dados pessoais</h2>
-            <p class="mt-1 text-sm text-texto-mudo">
-                CPF, nascimento e WhatsApp são obrigatórios: sustentam o contrato,
-                o controle de menor de idade e a cobrança.
-            </p>
-
+ 
             {{-- A largura acompanha o conteúdo: "Sexo" tem três opções e não
                  merece o mesmo espaço de um nome completo. --}}
             <x-ui.grade-formulario class="mt-6">
@@ -115,7 +111,6 @@
         {{-- ==================== Endereço ==================== --}}
         <x-ui.cartao>
             <h2 class="text-lg text-texto">Endereço</h2>
-            <p class="mt-1 text-sm text-texto-mudo">Opcional. O CEP preenche o resto.</p>
 
             <x-ui.grade-formulario class="mt-6">
                 {{-- O `ajuda` do CEP fica vazio no uso normal: só aparece
