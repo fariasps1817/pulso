@@ -142,34 +142,58 @@ Toda entidade segue o mesmo caminho. Quem aprendeu a mexer em alunos sabe mexer 
 
 ---
 
-## 5. Componentes que faltam construir
+## 5. Componentes
 
-Existem hoje: botão, campo de texto, pílula de estado, cartão, logo e alternador de tema.
+Todos visíveis em **`/catalogo`** (fora de produção), nos dois temas.
 
-| Componente | Para quê |
-|---|---|
-| Layout do painel | Cabeçalho, barra lateral, área de conteúdo |
-| Barra lateral | Recolhível, com estado salvo no perfil |
-| Cabeçalho de página | Título, subtítulo, ações à direita |
-| Tabela responsiva | Vira lista de cartões abaixo de certa largura |
-| Paginação | Com total de registros |
-| Campo com máscara | CPF, CNPJ, telefone, CEP, dinheiro |
-| Campo de data | Texto com máscara e teclado numérico |
-| Seletor (combo) com busca | Plano, unidade, profissional |
-| Seletor de cidade/UF | Alimentado pelo IBGE, com cache |
-| Área de texto | Observações |
-| Caixa de seleção e opção | Marcações do cadastro |
-| Interruptor | Ativo/inativo |
-| Modal de confirmação | Exclusão e ações irreversíveis |
-| Aviso de topo | Recados do super administrador |
-| Abas | Blocos da tela de detalhes |
-| Upload de imagem | Foto do aluno, logo da academia |
-| Estado vazio | "Nenhum aluno ainda" com o caminho para o primeiro |
-| Indicador de carregamento | Esqueleto, não roda girando |
-| Notificação de ação | "Pagamento registrado" |
-| Barra de busca | Com resultado enquanto digita |
+| Componente | Blade | Situação |
+|---|---|:--:|
+| Logo | `x-marca.logo` | ✅ |
+| Botão | `x-ui.botao` | ✅ |
+| Campo de texto | `x-ui.campo` | ✅ |
+| Campo com máscara | `x-ui.campo-mascara` | ✅ |
+| Campo de dinheiro | `x-ui.campo-dinheiro` | ✅ |
+| Área de texto | `x-ui.area-texto` | ✅ |
+| Seletor | `x-ui.selecao` | ✅ |
+| Caixa de seleção | `x-ui.caixa-selecao` | ✅ |
+| Interruptor | `x-ui.interruptor` | ✅ |
+| Envio de imagem | `x-ui.envio-imagem` | ✅ |
+| Invólucro de campo | `x-ui.grupo-campo` | ✅ |
+| Pílula de estado | `x-ui.pilula` | ✅ |
+| Cartão | `x-ui.cartao` | ✅ |
+| Aviso | `x-ui.aviso` | ✅ |
+| Aviso rápido | `x-ui.notificacoes` | ✅ |
+| Tabela responsiva | `x-ui.tabela` | ✅ |
+| Paginação | `x-ui.paginacao` | ✅ |
+| Barra de busca | `x-ui.busca` | ✅ |
+| Cabeçalho de página | `x-ui.cabecalho-pagina` | ✅ |
+| Abas | `x-ui.abas` + `x-ui.painel-aba` | ✅ |
+| Menu suspenso | `x-ui.menu` + `x-ui.menu-item` | ✅ |
+| Confirmação | `x-ui.modal` | ✅ |
+| Estado vazio | `x-ui.estado-vazio` | ✅ |
+| Esqueleto de carregamento | `x-ui.esqueleto` | ✅ |
+| Alternador de tema | `x-ui.alternador-tema` | ✅ |
+| Layout do painel | `x-layout.painel` | ✅ |
+| Item de navegação | `x-painel.item-navegacao` | ✅ |
+| Seletor de cidade/UF (IBGE) | — | ⬜ com o CRUD de endereço |
+| Seletor com busca | — | ⬜ quando houver listas grandes |
 
-**São ~19 componentes.** Construí-los antes das telas de CRUD evita reescrever cada um três vezes.
+### 5.1 Dois bundles, de propósito
+
+| Bundle | Quem carrega | Peso |
+|---|---|---|
+| `app.js` | Site institucional, login | ~0,6 kB comprimido |
+| `painel.js` | Painel e catálogo | ~87 kB comprimido |
+
+Alpine e Livewire só entram no painel. A página inicial precisa abrir rápido numa conexão ruim, e a tela de login não usa nada disso.
+
+### 5.2 Duas armadilhas que já custaram caro aqui
+
+**O Alpine só inicializa dentro de uma raiz `x-data`.** Um `<input x-mask="...">` solto na página nunca é processado — o campo fica sem máscara e nada indica o motivo. Por isso `x-ui.campo-mascara` e `x-ui.campo-dinheiro` trazem um `x-data` vazio. Ao criar componente novo com diretiva do Alpine, lembre disso.
+
+**O script do `@livewireScripts` roda antes do nosso bundle.** Ele é clássico e executa durante a análise do HTML; o nosso é módulo e roda depois. Resultado: o Alpine já teria iniciado quando fôssemos registrar os plugins, e `x-mask` jamais existiria. Por isso o Livewire é importado dentro de `resources/js/painel.js`, e o layout usa `@livewireScriptConfig` no lugar de `@livewireScripts`.
+
+**Classe estática do Tailwind briga com `:class` do Alpine.** `class="translate-x-1"` junto de `:class="ligado ? 'translate-x-6' : 'translate-x-1'"` não alterna: quem decide é a ordem no CSS, não a do atributo. O valor que muda vive só no binding.
 
 ---
 

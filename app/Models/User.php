@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'preferencias'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -20,8 +20,6 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * Get the attributes that should be cast.
-     *
      * @return array<string, string>
      */
     protected function casts(): array
@@ -29,6 +27,16 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            // Preferências de interface: tema, barra lateral, itens por
+            // página. Documento JSON porque a lista cresce, e cada item novo
+            // viraria uma migration se fosse coluna.
+            'preferencias' => 'array',
         ];
+    }
+
+    /** Lê uma preferência, com valor padrão quando ainda não foi definida. */
+    public function preferencia(string $chave, mixed $padrao = null): mixed
+    {
+        return data_get($this->preferencias, $chave, $padrao);
     }
 }

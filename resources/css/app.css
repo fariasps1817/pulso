@@ -164,6 +164,92 @@
 }
 
 /* -------------------------------------------------------------------------
+   Elementos do Alpine que so devem aparecer depois de inicializados.
+   Sem isto, o conteudo de x-show pisca na tela antes do JS assumir.
+   ------------------------------------------------------------------------- */
+[x-cloak] {
+    display: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   Tabela que vira lista de cartoes no celular.
+
+   Abaixo de 768px o cabecalho some e cada linha vira um cartao, com o rotulo
+   da coluna vindo do atributo data-rotulo da celula. E o que o guia de marca
+   exige: "tabela financeira nao vira tabela apertada no celular".
+
+   CSS puro de proposito — sem JavaScript, sem duplicar a marcacao, e imprime
+   bem. A celula marcada com data-principal vira o titulo do cartao.
+   ------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+    .tabela-responsiva thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .tabela-responsiva,
+    .tabela-responsiva tbody,
+    .tabela-responsiva tr,
+    .tabela-responsiva td {
+        display: block;
+    }
+
+    .tabela-responsiva tr {
+        padding: var(--e-3) var(--e-4);
+    }
+
+    /* O container nao rola na horizontal aqui: no formato cartao nao ha o
+       que rolar, e deixar o overflow ativo esconde conteudo fora da tela. */
+    .tabela-responsiva-container {
+        overflow-x: visible;
+    }
+
+    .tabela-responsiva td {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        /* Valor longo ("Trimestral · completo") desce para a linha de baixo
+           em vez de empurrar a largura do cartao e sumir na borda. */
+        flex-wrap: wrap;
+        gap: var(--e-1) var(--e-4);
+        padding: var(--e-1) 0;
+        text-align: right;
+    }
+
+    /* O rotulo da coluna, a esquerda, no lugar do cabecalho que sumiu. */
+    .tabela-responsiva td::before {
+        content: attr(data-rotulo);
+        color: var(--cor-texto-mudo);
+        font-size: var(--txt-sm);
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    /* Quando o valor desce de linha, ele ocupa a largura toda e continua
+       alinhado a direita, embaixo do rotulo. */
+    .tabela-responsiva td > * {
+        min-width: 0;
+        margin-left: auto;
+    }
+
+    /* A celula principal (o nome) vira titulo do cartao, sem rotulo. */
+    .tabela-responsiva td[data-principal] {
+        display: block;
+        padding-bottom: var(--e-2);
+        text-align: left;
+        font-size: var(--txt-lg);
+    }
+
+    .tabela-responsiva td[data-principal]::before {
+        content: none;
+    }
+}
+
+/* -------------------------------------------------------------------------
    Alternador de tema — unica regra do projeto que consulta o tema vigente.
 
    Nao viola a regra do guia de marca: aqui nao se declara cor nenhuma, apenas

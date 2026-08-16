@@ -1,6 +1,15 @@
 @props([
     'titulo' => null,
     'descricao' => 'Sistema de gestão de academias: matrículas, mensalidades, controle de acesso por catraca e alertas de inadimplência e evasão.',
+    /*
+     * Carrega Livewire — e, com ele, o Alpine que os componentes interativos
+     * usam (barra lateral, abas, menu, interruptor, máscara de campo).
+     *
+     * Fica desligado por padrão de propósito: o site institucional e a tela
+     * de login não precisam de nada disso, e a academia pode estar numa
+     * conexão instável. Só o painel e o catálogo ligam.
+     */
+    'comLivewire' => false,
 ])
 
 <!DOCTYPE html>
@@ -8,6 +17,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="{{ $descricao }}">
     <meta name="theme-color" content="#0A5673">
 
@@ -39,9 +49,23 @@
 
     @fonts
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if ($comLivewire)
+        @livewireStyles
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/painel.js'])
+    @else
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
 </head>
 <body {{ $attributes->merge(['class' => 'min-h-dvh bg-fundo text-texto antialiased']) }}>
     {{ $slot }}
+
+    {{--
+        @livewireScriptConfig, e não @livewireScripts: o Livewire vem
+        empacotado em painel.js, para que os plugins do Alpine sejam
+        registrados antes do Livewire.start(). Ver resources/js/painel.js.
+    --}}
+    @if ($comLivewire)
+        @livewireScriptConfig
+    @endif
 </body>
 </html>

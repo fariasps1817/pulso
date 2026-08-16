@@ -63,14 +63,22 @@ docs/marca/            Guia de marca, tokens de design e assets
 lang/pt_BR/            Mensagens de validação, autenticação e senha
 resources/
   css/app.css          Ponte tokens -> Tailwind (@theme inline)
-  js/tema.js           Troca de tema: claro / escuro / sistema
+  js/
+    app.js             Bundle público — leve, sem Alpine
+    painel.js          Bundle do painel — Livewire + Alpine + máscaras
+    tema.js            Troca de tema: claro / escuro / sistema
+    mascaras.js        CPF, CNPJ, telefone, CEP, data, dinheiro
+    notificacoes.js    Avisos rápidos ("Pagamento registrado")
+    modais.js          Abertura dos <dialog>
   views/
     components/        Componentes Blade
-      layout/          base, publico, acesso
+      layout/          base, publico, acesso, painel
       marca/           logo
-      ui/              botao, campo, pilula, cartao, alternador-tema
+      painel/          item-navegacao
+      ui/              27 componentes — ver docs/interface/
     site/inicio        Página inicial
     acesso/            Login, esqueci a senha, redefinir senha
+    catalogo/          Catálogo do design system (fora de produção)
     painel/            Destino pós-login (provisório)
 tests/
   Unit/                Sem banco
@@ -151,9 +159,9 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | Etapa | Situação |
 |---|---|
 | 1. Fundação, design system, página inicial e acesso | ✅ concluída |
-| 2a. Modelo de domínio e convenções de interface, em texto | 🔶 em revisão |
-| 2b. Design system completo (~19 componentes) | ⬜ depende de 2a |
-| 2c. Migrations, models e Row Level Security | ⬜ depende de 2a |
+| 2a. Modelo de domínio e convenções de interface, em texto | ✅ concluída |
+| 2b. Design system — 27 componentes e o catálogo em `/catalogo` | ✅ concluída |
+| 2c. Migrations, models e Row Level Security | ⬜ próxima |
 | 3. Cadastros: alunos, planos, matrículas | ⬜ |
 | 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ |
 | 5. Controle de acesso: catraca e biometria | ⬜ |

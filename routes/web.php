@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\PreferenciaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,4 +44,21 @@ Route::redirect('/esqueci-a-senha', '/forgot-password')->name('acesso.esqueci-a-
 
 Route::middleware(['auth'])->group(function (): void {
     Route::view('/painel', 'painel.inicio')->name('painel.inicio');
+
+    Route::post('/preferencias', [PreferenciaController::class, 'salvar'])->name('preferencias.salvar');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Catálogo do design system
+|--------------------------------------------------------------------------
+|
+| Todos os componentes numa página só, para revisar aparência e comportamento
+| nos dois temas antes de montar as telas de verdade. Fica fora do ar em
+| producao: é ferramenta de construção, não parte do produto.
+|
+*/
+
+if (! app()->isProduction()) {
+    Route::view('/catalogo', 'catalogo.index')->name('catalogo');
+}

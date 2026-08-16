@@ -7,6 +7,7 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@alpinejs/mask": "^3.16.1",
         "@fontsource/inter": "^5.3.0",
         "@fontsource/sora": "^5.3.0",
         "@tailwindcss/vite": "^4.0.0",

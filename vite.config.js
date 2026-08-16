@@ -16,7 +16,12 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            /*
+             * Dois pontos de entrada de propósito:
+             *   app.js    site institucional e login — leve, sem Alpine
+             *   painel.js painel e catálogo — Livewire, Alpine e máscaras
+             */
+            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/js/painel.js'],
             refresh: true,
             fonts: [
                 fontsource('Sora', {
