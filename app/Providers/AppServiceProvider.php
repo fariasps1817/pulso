@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Support\Academia\ContextoAcademia;
+use App\Support\Catraca\AparelhoAtual;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,6 +15,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Uma requisição, uma academia.
         $this->app->singleton(ContextoAcademia::class);
+
+        // Uma requisição do aparelho biométrico, um aparelho.
+        $this->app->singleton(AparelhoAtual::class);
     }
 
     public function boot(): void

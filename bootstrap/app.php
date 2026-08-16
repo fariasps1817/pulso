@@ -8,12 +8,21 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function (): void {
+            /*
+             * O aparelho biométrico fala num grupo próprio, sem `web`: ele não
+             * tem sessão, cookie nem token CSRF. A identidade dele é o número
+             * de série.
+             */
+            Route::middleware([])->group(base_path('routes/catraca.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [

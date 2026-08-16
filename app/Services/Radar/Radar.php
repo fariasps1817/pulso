@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Radar;
 
 use App\Enums\ResultadoAcesso;
+use App\Enums\SentidoAcesso;
 use App\Enums\SituacaoMatricula;
 use App\Models\Academia;
 use App\Models\Acesso;
@@ -132,7 +133,9 @@ final class Radar
 
         return $this->consultaDeSumidos()
             ->withMax(
-                ['acessos as ultimo_acesso_em' => fn (Builder $q) => $q->where('resultado', ResultadoAcesso::Liberado)],
+                ['acessos as ultimo_acesso_em' => fn (Builder $q) => $q
+                    ->where('resultado', ResultadoAcesso::Liberado)
+                    ->where('sentido', SentidoAcesso::Entrada)],
                 'ocorreu_em',
             )
             /*
@@ -167,14 +170,22 @@ final class Radar
                 $this->restringirUnidade($consulta);
             })
             /*
+             * Duas restrições, e cada uma corrige um jeito diferente de o
+             * número mentir:
+             *
              * Só passagem LIBERADA conta como treino. Quem foi barrado na
              * catraca apareceu, mas não treinou — e é justamente quem a
              * academia precisa procurar.
              *
-             * Sem passagem liberada recente = sumido. Inclui quem nunca veio.
+             * Só ENTRADA conta. A catraca é de contato seco e o Pulso deduz o
+             * sentido alternando; contar a saída também faria a frequência de
+             * quem registra as duas pontas valer o dobro.
+             *
+             * Sem entrada liberada recente = sumido. Inclui quem nunca veio.
              */
             ->whereDoesntHave('acessos', fn (Builder $q) => $q
                 ->where('resultado', ResultadoAcesso::Liberado)
+                ->where('sentido', SentidoAcesso::Entrada)
                 ->where('ocorreu_em', '>=', $limite));
     }
 

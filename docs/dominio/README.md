@@ -481,9 +481,65 @@ Ordem de avaliação. O primeiro "não" bloqueia:
 1. A credencial existe, está ativa e pertence a um aluno da unidade?
 2. A matrícula está `ativa` ou em `experiencia`?
 3. O plano dá acesso a **esta** unidade? (`acesso_todas_unidades`)
-4. Existe mensalidade vencida além da tolerância? *(dias de tolerância — pendência §7.3)*
+4. Existe mensalidade vencida além da tolerância?
 
 Bloqueou, a catraca mostra **"Procure a recepção"**. O motivo real vai para `acessos.motivo`.
+
+#### 5.4.1 O que o equipamento real impõe
+
+Equipamento adotado: **ZKTeco SenseFace 2A**, protocolo PUSH/ADMS. A especificação completa, com tráfego real capturado, está em [`docs/zkteco/`](../zkteco/) — é a fonte da verdade do formato, e não deve ser reescrita a partir de memória.
+
+**O aparelho não é servidor.** Ele é um cliente HTTP que faz polling no Pulso. Nunca abrimos conexão com ele: enfileiramos comandos e ele os busca. Isso muda quem decide o quê.
+
+**A avaliação acima acontece NO APARELHO, não no Pulso.** No dialeto de ponto (`att`), que é o que este modelo fala, ele reconhece o rosto localmente e aciona o relé sozinho — a passagem chega para nós depois de já ter acontecido. Portanto:
+
+- O Pulso **não nega em tempo real**. Bloquear significa manter a lista de usuários do aparelho sincronizada.
+- **Bloqueio nunca apaga o usuário.** `DATA DELETE USERINFO` leva junto as biometrias, e a especificação avisa que o template facial nem sempre volta para o servidor. O aluno teria que cadastrar o rosto de novo, no balcão. O bloqueio troca o **grupo** do usuário para um sem faixa de horário liberada.
+- Tem um lado bom: a catraca continua funcionando com a internet caída.
+
+> O disparo automático do bloqueio ao vencer a tolerância fica **desligado** até o comportamento do grupo ser verificado com o equipamento em mãos. Enfileirar um bloqueio que o aparelho interprete de outro jeito é o tipo de erro que só aparece com o aluno parado na porta.
+
+#### 5.4.2 Entrada e saída numa catraca que não sabe o lado
+
+A catraca é genérica, de **contato seco**: o leitor fecha um relé por um segundo e ela libera o giro. Um equipamento por catraca. Nem a catraca informa a direção do giro, nem o leitor sabe — e o protocolo confirma, mandando `Status=255`, "sem estado".
+
+O sentido é **deduzido por alternância**, com três guardas:
+
+| Situação | Resultado |
+|---|---|
+| Detecção repetida em segundos | Descartada — repique do relé, ou a pessoa mostrando o rosto de novo porque a catraca demorou a destravar |
+| Sem passagem anterior, ou a anterior foi saída | **Entrada** |
+| Entrada há menos que a tolerância (padrão **4 h**) | **Saída** |
+| Entrada há mais que a tolerância | **Nova entrada**; a anterior é encerrada como saída *presumida* |
+
+Uma rotina noturna (`pulso:fechar-acessos`) fecha o que ficou aberto. Sem ela, quem sai sem passar de novo fica marcado como presente para sempre, e "quem está na academia agora" vira ficção.
+
+**Saída presumida não gera tempo de permanência.** Ninguém mediu a hora de saída; devolver a diferença até o instante em que o sistema concluiu seria inventar um número com cara de medição, e um relatório montado sobre isso mentiria com confiança.
+
+**Para o Radar, treino é entrada.** Contar a saída também faria a frequência de quem registra as duas pontas valer o dobro.
+
+#### 5.4.3 Duas defesas que trabalham juntas
+
+O aparelho **reenvia o lote inteiro** sempre que não recebe `OK`. Por isso:
+
+1. Todo endpoint responde **200 com `OK`**, inclusive quando o processamento falha (o erro vai para o log). Devolver 4xx/5xx transformaria um defeito nosso numa enxurrada de reenvios.
+2. Cada passagem carrega uma **chave de origem** — `sha256(série|PIN|instante|status|método)` — num índice único. O ATTLOG não traz identificador próprio; esta é a recomendação do próprio fabricante.
+
+Risco residual assumido: duas passagens do mesmo aluno no **mesmo segundo** colapsam em uma. Numa catraca que gira uma pessoa por vez, é fisicamente improvável.
+
+#### 5.4.4 Como o aparelho é identificado
+
+Ele não faz login: manda o número de série em toda chamada. O middleware traduz série → academia, e só então o contexto existe.
+
+Isso cria um ovo e uma galinha, porque `dispositivos_acesso` está sob RLS: a consulta que define o contexto aconteceria *sem* contexto. A saída foi uma função `SECURITY DEFINER` estreita, `pulso_dispositivo_por_serie(text)`, que devolve **apenas** a tripla de roteamento para um serial exato. A aplicação não ganha "ler dispositivos" — ganha "traduzir um serial que ela já conhece".
+
+**Serial desconhecido recebe `OK` e é descartado.** Responder erro faria o aparelho insistir para sempre, e responder diferente do caso conhecido diria a quem estivesse sondando quais seriais existem.
+
+#### 5.4.5 O simulador
+
+`/acesso/simulador`, fora do ar em produção. Ele monta a mesma linha de ATTLOG que o SenseFace monta e a entrega nos mesmos endpoints, passando pelo mesmo middleware — o tráfego dos dois lados fica visível na tela.
+
+É deliberado que ele não grave direto na tabela: um botão que fizesse isso testaria a tela e não testaria o TAB entre campos, a resposta `OK`, a idempotência, a fila nem o roteamento pelo serial. Quando o equipamento chegar, a integração precisa ser confirmação, não estreia.
 
 ### 5.5 O que o Radar mostra
 

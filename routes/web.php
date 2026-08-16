@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\PreferenciaController;
 use App\Http\Controllers\UnidadeAtualController;
+use App\Livewire\Acesso;
 use App\Livewire\Alunos;
 use App\Livewire\Matriculas;
 use App\Livewire\Mensalidades;
@@ -74,6 +75,18 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('/', Matriculas\Lista::class)->name('lista');
         Route::get('/nova', Matriculas\Formulario::class)->name('nova');
         Route::get('/{matricula}', Matriculas\Detalhes::class)->name('detalhes');
+    });
+
+    /*
+     * Controle de acesso. O simulador fica fora do ar em producao: e
+     * ferramenta de construcao, como o catalogo do design system.
+     */
+    Route::prefix('acesso')->name('acesso.')->group(function (): void {
+        Route::get('/', Acesso\Painel::class)->name('painel');
+
+        if (! app()->isProduction()) {
+            Route::get('/simulador', Acesso\Simulador::class)->name('simulador');
+        }
     });
 
     Route::prefix('mensalidades')->name('mensalidades.')->group(function (): void {

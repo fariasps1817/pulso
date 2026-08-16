@@ -51,6 +51,7 @@ app/
   Rules/               CPF válido, data brasileira
   Services/Enderecos/  ViaCEP e IBGE, com cache e sem travar o cadastro
   Services/Radar/      Os números do Radar, separados da tela
+  Services/Catraca/    Protocolo do leitor biométrico e a dedução de entrada/saída
   Http/Middleware/     DefinirAcademiaAtual — alimenta o RLS
   Models/              16 models; Concerns/PertenceAAcademia aplica o filtro
   Providers/           AppServiceProvider, FortifyServiceProvider
@@ -151,8 +152,21 @@ Na VPS, um cron chama o agendador do Laravel a cada minuto:
 | Rotina | Quando | O que faz |
 |---|---|---|
 | `pulso:gerar-mensalidades` | 03:10, diário | Gera as mensalidades do mês para as matrículas ativas |
+| `pulso:fechar-acessos` | 03:40, diário | Encerra as entradas na catraca que ficaram abertas |
 
 A geração é **idempotente**: o índice único `(matricula_id, competencia)` impede duplicata, então rodar de novo é seguro. Roda pela conexão da aplicação — percorre as academias definindo o contexto de cada uma, e o RLS a autoriza uma a uma, sem precisar de um papel que atravessa o isolamento.
+
+## Catraca e leitor biométrico
+
+Equipamento adotado: **ZKTeco SenseFace 2A** (protocolo PUSH/ADMS), acionando uma catraca genérica por contato seco.
+
+**O aparelho é o cliente, não o servidor.** Ele faz polling em `/iclock/*` a cada poucos segundos; o Pulso nunca abre conexão com ele. Cadastrar um aluno no leitor é enfileirar um comando e esperar a próxima pergunta.
+
+Como a catraca não informa a direção do giro, **entrada e saída são deduzidas** pela alternância com a passagem anterior, com tolerância de 4 horas para presumir que o aluno saiu sem registrar. Saída presumida fica marcada como tal e não gera tempo de permanência.
+
+Sem o equipamento em mãos, `/acesso/simulador` (fora do ar em produção) monta a mesma linha do protocolo e a entrega nos mesmos endpoints, passando pelo mesmo middleware.
+
+Detalhes e decisões em [`docs/dominio/README.md` §5.4](docs/dominio/README.md). A especificação do protocolo, com tráfego real capturado, está em [`docs/zkteco/`](docs/zkteco/) — **é a fonte da verdade do formato**.
 
 ## Qualidade
 
@@ -194,6 +208,7 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 4a. Mensalidades: geração automática, recebimento e estorno | ✅ concluída |
 | 4b. Cobrança online (Pix) — provedor a definir | ⬜ |
 | 5. Radar — inadimplência, baixa frequência, risco de evasão e aniversariantes | ✅ concluída |
-| 6. Controle de acesso: catraca e biometria | ⬜ próxima |
+| 6a. Catraca: protocolo do leitor, entrada/saída, tela e simulador | ✅ concluída |
+| 6b. Biometria: cadastro facial e digital pelo Pulso | ⬜ próxima |
 | 7. Notificações por WhatsApp | ⬜ |
 | 8. Deploy na VPS | ⬜ |

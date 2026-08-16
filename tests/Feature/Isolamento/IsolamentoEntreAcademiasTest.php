@@ -183,7 +183,7 @@ final class IsolamentoEntreAcademiasTest extends TestCase
         $tabelas = [
             'profissionais', 'alunos', 'planos', 'matriculas', 'mensalidades',
             'cobrancas', 'pagamentos', 'consentimentos_lgpd', 'credenciais_acesso',
-            'dispositivos_acesso', 'acessos', 'notificacoes',
+            'dispositivos_acesso', 'acessos', 'comandos_dispositivo', 'notificacoes',
         ];
 
         foreach ($tabelas as $tabela) {

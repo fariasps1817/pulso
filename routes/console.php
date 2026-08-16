@@ -33,3 +33,18 @@ Schedule::command('pulso:gerar-mensalidades')
     ->dailyAt('03:10')
     ->withoutOverlapping()
     ->onOneServer();
+
+/*
+ * Fechamento das entradas abandonadas na catraca.
+ *
+ * A catraca e de contato seco e nao conta para que lado girou: o sentido e
+ * deduzido pela alternancia. Quem entra e vai embora sem passar de novo
+ * ficaria "dentro da academia" para sempre, e o numero que a recepcao usa
+ * para saber se pode fechar viraria ficcao.
+ *
+ * Roda de madrugada, depois de a academia ter fechado.
+ */
+Schedule::command('pulso:fechar-acessos')
+    ->dailyAt('03:40')
+    ->withoutOverlapping()
+    ->onOneServer();

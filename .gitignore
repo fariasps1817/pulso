@@ -30,3 +30,12 @@ Homestead.yaml
 npm-debug.log
 Thumbs.db
 yarn-error.log
+
+# Documentacao do fabricante do leitor biometrico.
+#
+# A pasta contem PDFs da ZKTeco e um resumo tecnico marcado como CONFIDENCIAL,
+# derivado de material sob NDA. Este repositorio e PUBLICO, entao ela fica de
+# fora — o codigo a referencia, mas nao depende dela para rodar.
+#
+# Para versiona-la, torne o repositorio privado antes.
+/docs/zkteco/
