@@ -59,7 +59,7 @@
 
     <form method="POST" action="{{ route('logout') }}" class="border-t border-borda">
         @csrf
-        <x-ui.menu-item type="submit" icone="M12.5 14.5 17 10l-4.5-4.5M17 10H7M9 3.5H4.5v13H9">
+        <x-ui.menu-item tipo="submit" icone="M12.5 14.5 17 10l-4.5-4.5M17 10H7M9 3.5H4.5v13H9">
             Sair
         </x-ui.menu-item>
     </form>

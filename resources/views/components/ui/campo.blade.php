@@ -11,6 +11,10 @@
 {{-- Campo de texto comum. Para CPF, telefone, CEP e data use x-ui.campo-mascara. --}}
 
 @php
+    // "tipo" e "type" valem o mesmo — ver a explicação em x-ui.botao.
+    $tipo = $attributes->get('type', $tipo);
+    $attributes = $attributes->except('type');
+
     $id = $attributes->get('id', $nome);
     $temErro = $errors->has($nome);
     $descritores = trim(implode(' ', array_filter([

@@ -193,6 +193,10 @@ Alpine e Livewire só entram no painel. A página inicial precisa abrir rápido 
 
 **O script do `@livewireScripts` roda antes do nosso bundle.** Ele é clássico e executa durante a análise do HTML; o nosso é módulo e roda depois. Resultado: o Alpine já teria iniciado quando fôssemos registrar os plugins, e `x-mask` jamais existiria. Por isso o Livewire é importado dentro de `resources/js/painel.js`, e o layout usa `@livewireScriptConfig` no lugar de `@livewireScripts`.
 
+**Propriedade em português vs. atributo HTML em inglês.** Os componentes usam `tipo`, `rotulo`, `variante`; o HTML usa `type`, `label`. Escrever `type="submit"` — o reflexo de quem conhece HTML — fazia o valor cair nos atributos extras, e o botão saía com **dois** `type`: o do componente primeiro, o de quem chamou depois. O navegador usa o primeiro, então o botão não enviava o formulário. Sem erro e sem aviso — foi assim que o "Sair" ficou inerte.
+
+`x-ui.botao`, `x-ui.campo` e `x-ui.menu-item` passaram a aceitar as duas grafias e a remover o atributo duplicado. **Ao criar componente novo que renderiza um atributo a partir de propriedade, faça o mesmo.**
+
 **Classe estática do Tailwind briga com `:class` do Alpine.** `class="translate-x-1"` junto de `:class="ligado ? 'translate-x-6' : 'translate-x-1'"` não alterna: quem decide é a ordem no CSS, não a do atributo. O valor que muda vive só no binding.
 
 ---

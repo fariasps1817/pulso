@@ -13,6 +13,15 @@
 --}}
 
 @php
+    /*
+     * "tipo" e "type" valem o mesmo. Sem isto, quem escreve type="submit" —
+     * o reflexo de quem conhece HTML — produz um botão com dois atributos
+     * type, e o navegador usa o primeiro. O botão não envia o formulário e
+     * nada indica o motivo.
+     */
+    $tipo = $attributes->get('type', $tipo);
+    $attributes = $attributes->except('type');
+
     $base = 'inline-flex items-center justify-center gap-2 rounded-md font-medium '
         .'transition-colors duration-150 select-none '
         .'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco '

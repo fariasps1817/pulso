@@ -7,6 +7,19 @@
 ])
 
 @php
+    /*
+     * As propriedades deste projeto são em português, mas o atributo HTML é
+     * "type". Escrever type="submit" — o reflexo natural de quem conhece HTML —
+     * fazia o valor cair nos atributos extras, e o botão saía com DOIS type:
+     * o do componente primeiro, o de quem chamou depois. O navegador usa o
+     * primeiro, então o botão simplesmente não enviava o formulário. Sem erro,
+     * sem aviso: o "Sair" só não fazia nada.
+     *
+     * Aqui as duas grafias passam a valer, e o atributo duplicado é removido.
+     */
+    $tipo = $attributes->get('type', $tipo);
+    $attributes = $attributes->except('type');
+
     $classes = 'flex min-h-toque w-full items-center gap-3 px-4 text-left text-base transition-colors '
         .'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-foco '
         .($destrutivo
