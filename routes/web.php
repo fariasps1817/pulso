@@ -7,6 +7,7 @@ use App\Http\Controllers\UnidadeAtualController;
 use App\Livewire\Alunos;
 use App\Livewire\Matriculas;
 use App\Livewire\Mensalidades;
+use App\Livewire\Painel;
 use App\Livewire\Planos;
 use Illuminate\Support\Facades\Route;
 
@@ -42,13 +43,12 @@ Route::redirect('/esqueci-a-senha', '/forgot-password')->name('acesso.esqueci-a-
 | Painel (autenticado)
 |--------------------------------------------------------------------------
 |
-| Placeholder do destino pos-login (config/fortify.php -> 'home'). O painel de
-| verdade — Radar, alunos, mensalidades — entra nas proximas etapas.
+| Destino pos-login (config/fortify.php -> 'home'): o Radar.
 |
 */
 
 Route::middleware(['auth'])->group(function (): void {
-    Route::view('/painel', 'painel.inicio')->name('painel.inicio');
+    Route::get('/painel', Painel\Radar::class)->name('painel.inicio');
 
     Route::post('/preferencias', [PreferenciaController::class, 'salvar'])->name('preferencias.salvar');
     Route::post('/unidade-atual', [UnidadeAtualController::class, 'trocar'])->name('painel.trocar-unidade');

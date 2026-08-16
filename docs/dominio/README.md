@@ -500,6 +500,31 @@ Nenhuma tabela nova — são quatro consultas:
 
 Some junto, sem tabela nova: **aniversariantes do dia** — `alunos` com `data_nascimento` no dia e matrícula ativa. É por isso que a data de nascimento é obrigatória.
 
+#### Duas regras que a implementação acrescentou
+
+**1. Sem catraca integrada, o Radar não acusa ninguém.**
+
+Se a academia ainda não ligou o equipamento, não existe `acesso` nenhum — e a consulta de baixa frequência devolveria *todos* os alunos como sumidos. Um número grande, alarmante e sem significado é pior do que número nenhum, porque ensina a gestão a ignorar o Radar. Então o cartão pergunta antes se há qualquer registro de acesso na unidade; não havendo, mostra "—" e diz que a catraca ainda não registra acessos.
+
+**2. Só passagem liberada conta como treino.**
+
+Quem foi barrado na catraca apareceu, mas não treinou — e é exatamente quem a academia precisa procurar. Contar a tentativa bloqueada como frequência esconderia o caso mais grave.
+
+#### "A receber" e "o que entrou" são perguntas diferentes
+
+É esta distinção que dá conteúdo ao `👁 parcial` da recepção na matriz de permissões (§4.2.1):
+
+| Número | Pergunta | Quem vê |
+|---|---|---|
+| Vencidas, vencem hoje, a cobrar, sumidos | *o que precisa ser feito hoje* | quem tem `radar.ver` |
+| Recebido no mês | *quanto a academia faturou* | só com `relatorio_financeiro.ver` |
+
+A recepção precisa saber quem deve para atender e cobrar; o faturamento do mês não é operação dela. Pagamento estornado não entra no segundo número — o dinheiro voltou.
+
+#### Cada número leva a uma ação
+
+O Radar não é painel de gráficos: é a lista do que fazer hoje. Cada cartão abre a tela onde o problema se resolve, e a fila de cobrança vem do vencimento mais antigo para o mais novo, que é a ordem em que a recepção liga. Número que não vira ação não entra na tela.
+
 ### 5.6 Situação da academia perante o Pulso
 
 | Situação | O que acontece |

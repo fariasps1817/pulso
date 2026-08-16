@@ -50,6 +50,7 @@ app/
   Policies/            Quem pode o quê, conforme a matriz de papéis
   Rules/               CPF válido, data brasileira
   Services/Enderecos/  ViaCEP e IBGE, com cache e sem travar o cadastro
+  Services/Radar/      Os números do Radar, separados da tela
   Http/Middleware/     DefinirAcademiaAtual — alimenta o RLS
   Models/              16 models; Concerns/PertenceAAcademia aplica o filtro
   Providers/           AppServiceProvider, FortifyServiceProvider
@@ -192,7 +193,7 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 3c. Matrículas — criação, experiência, conversão, trancamento e encerramento | ✅ concluída |
 | 4a. Mensalidades: geração automática, recebimento e estorno | ✅ concluída |
 | 4b. Cobrança online (Pix) — provedor a definir | ⬜ |
-| 5. Controle de acesso: catraca e biometria | ⬜ |
-| 6. Radar | ⬜ |
+| 5. Radar — inadimplência, baixa frequência, risco de evasão e aniversariantes | ✅ concluída |
+| 6. Controle de acesso: catraca e biometria | ⬜ próxima |
 | 7. Notificações por WhatsApp | ⬜ |
 | 8. Deploy na VPS | ⬜ |
