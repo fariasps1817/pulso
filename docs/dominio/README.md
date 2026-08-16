@@ -25,7 +25,10 @@ Versão 1 — agosto/2026.
 | Multa por cancelamento | Campo existe, padrão zero |
 | Área "Meu Pulso" | Fora desta versão, mas o cadastro já nasce preparado |
 | Sessão do usuário | Única por padrão; login novo derruba a sessão anterior |
-| Super administrador | Área própria para gerenciar as academias |
+| Super administrador | Só o plano de controle. **Não** enxerga aluno, mensalidade nem biometria de academia alguma |
+| Idade do aluno | Mínima **12 anos**, máxima 99. Abaixo de 18, responsável obrigatório |
+| Validação de CPF | Só matemática (dígitos verificadores). Sem consulta a serviço pago |
+| Ordem de construção | Design system completo **antes** das telas de CRUD |
 
 **Fora do escopo, por decisão:** aulas coletivas e turmas, ficha de treino, avaliação física, caixa diário, contas a pagar, venda de produtos, comissão de professor. Não é "esquecido" — é adiado, e o modelo abaixo não impede acrescentar depois.
 
@@ -99,7 +102,7 @@ Convenções aplicadas a todas: chave `bigint` gerada por identidade, `created_a
 | `logo_path` | text, nulo | Logo da academia nos PDFs — **não** substitui a marca Pulso na interface |
 | `dias_tolerancia_bloqueio` | smallint | Padrão 5. Depois do vencimento, quantos dias a catraca ainda libera |
 | `dias_baixa_frequencia` | smallint | Padrão 15. A partir de quantos dias sem passar na catraca o aluno entra no Radar |
-| `idade_minima` | smallint | Padrão a definir — ver §7.1 |
+| `idade_minima` | smallint | Padrão **12**. Academia com atividade infantil pode baixar |
 | **Controle do SaaS** — só o super administrador altera | | |
 | `situacao` | text | `ativa`, `em_aviso`, `bloqueada`, `cancelada` — ver §5.6 |
 | `assinatura_vence_em` | date, nulo | |
@@ -548,7 +551,7 @@ A normalização acontece **ao gravar** (mutator no model), não na exibição: 
 | Campo | Regra |
 |---|---|
 | CPF | 11 dígitos, dígitos verificadores conferidos, rejeita sequências (`111.111.111-11`), único por academia |
-| Data de nascimento | Não pode ser futura; idade máxima **99 anos**; idade mínima conforme §7.1 |
+| Data de nascimento | Não pode ser futura; idade entre **12 e 99 anos** (mínima ajustável por academia) |
 | WhatsApp | 10 ou 11 dígitos com DDD válido |
 | CEP | 8 dígitos; preenche endereço pelo ViaCEP |
 | UF e cidade | Da API do IBGE, não digitação livre |
@@ -573,52 +576,35 @@ A normalização acontece **ao gravar** (mutator no model), não na exibição: 
 
 ---
 
-## 7. Pendências — preciso da sua decisão
+## 7. Pendências
 
-### 7.1 Qual a idade mínima para cadastrar um aluno?
+### 7.1 Provedor de Pix — a decidir juntos
 
-A idade **máxima** já está definida em 99 anos. Falta o piso, e ele muda o formulário: abaixo de 18 os campos de responsável passam a ser obrigatórios, e abaixo de um certo ponto a academia provavelmente nem aceita matrícula.
+Combinado pesquisar e decidir mais adiante. Até lá, `cobrancas` fica **neutra**: `provedor`, `id_externo`, `payload` (JSONB) e situação. Qualquer candidato encaixa nesse formato sem migration.
 
-### 7.2 Até onde o super administrador enxerga?
+Quando for a hora, comparo Asaas, Mercado Pago, Efí e integração direta com o banco por: custo do Pix, custo do cartão, prazo de repasse, qualidade do webhook, exigência de CNPJ e split para rede com filiais.
 
-O desenho atual dá a ele **apenas o plano de controle** — academias, unidades, avisos e usuários. Ele não vê aluno, mensalidade nem biometria de academia nenhuma, e as políticas de RLS não abrem exceção.
+### 7.2 API de WhatsApp
 
-É a opção mais defensável perante a LGPD, e a que menos expõe você a um vazamento. Em contrapartida, atender um chamado de suporte fica mais difícil: sem enxergar a tela do cliente, você depende do que ele descreve.
-
-### 7.3 Quando construir o design system completo?
-
-Hoje existem seis componentes (botão, campo, pílula, cartão, logo, alternador de tema) — o suficiente para a página inicial e o login, não para um CRUD.
-
-Faltam: barra lateral com recolher, cabeçalho de página, tabela que vira lista no celular, paginação, modal de confirmação, aviso de topo, abas, campo com máscara, seletor de data numérico, combo de busca, upload de imagem, estado vazio, indicador de carregamento e o layout do painel.
-
-### 7.4 Verificação de CPF em serviço externo
-
-Você citou "consultar API externa e verificar outros dados, como se o nome está correto". Isso precisa de distinção:
-
-- **Validar o CPF matematicamente** — grátis, offline, instantâneo. Pega erro de digitação. **Já está no plano.**
-- **Confirmar se o CPF existe e a quem pertence** — exige serviço pago (Serpro, ou revendas como Infosimples e BrasilAPI paga). Custa por consulta, precisa de contrato, e a consulta em si é tratamento de dado pessoal que entra no seu inventário de LGPD.
-
-### 7.5 Provedor de Pix — a decidir juntos
-
-Ficou combinado pesquisar e decidir junto, mais adiante. Até lá, `cobrancas` fica **neutra**: `provedor`, `id_externo`, `payload` (JSONB) e situação. Qualquer um dos candidatos encaixa nesse formato sem migration.
-
-Quando for a hora, comparo Asaas, Mercado Pago, Efí e banco direto por custo do Pix, custo do cartão, prazo de repasse, qualidade do webhook, exigência de CNPJ e split para rede com filiais.
-
-### 7.6 API de WhatsApp
-
-Você informará qual usaremos. O modelo já prevê `notificacoes` com `canal`, `modelo`, `destino` e `situacao` — serve para API oficial da Meta ou para intermediador, sem mudança de tabela.
+Você informará qual usaremos. O modelo já prevê `notificacoes` com `canal`, `modelo`, `destino` e `situacao` — serve tanto para a API oficial da Meta quanto para intermediador, sem mudança de tabela.
 
 ---
 
-## 8. O que já está resolvido nas telas
+## 8. Decisões fechadas nesta rodada
 
-Máscaras, teclado numérico, caixa de título, padrão de CRUD, barra lateral e componentes estão em [`../interface/README.md`](../interface/README.md). São convenção de interface, não modelo de dados — por isso vivem em outro documento.
+| Assunto | Decisão | Consequência no modelo |
+|---|---|---|
+| Alcance do super administrador | Só o plano de controle | Nenhuma exceção nas políticas de RLS. `academias`, `unidades` e `avisos_academia` ficam fora do isolamento por academia; todo o resto fica dentro, sem porta dos fundos |
+| Idade mínima do aluno | 12 anos, ajustável por academia | `academias.idade_minima` com padrão 12; validação por faixa em `alunos.data_nascimento` |
+| Verificação de CPF | Só matemática | Nenhuma dependência externa, nenhum custo por consulta, nada de dado pessoal saindo do sistema |
+| Ordem de construção | Design system antes do CRUD | Etapa 2b passa a ser os componentes; migrations viram 2c |
+
+**Sobre o super administrador — o que isso custa e por quê vale:** atender suporte fica mais difícil, porque você não enxerga a tela do cliente e depende do que ele descreve. Em troca, uma conta de super administrador comprometida **não** dá acesso a aluno, mensalidade ou biometria de academia nenhuma. Num sistema que guarda dado biométrico, essa é a troca certa. Se o suporte mostrar-se inviável na prática, a saída é impersonação auditada — não abrir o RLS.
 
 ---
 
 ## 9. O que acontece depois deste documento
 
-1. Você lê, risca e corrige — principalmente a §7.
-2. Fecho as pendências e ajusto o modelo.
-3. **Design system completo** (§7.3), porque as telas de CRUD dependem dele.
-4. Migrations, models, RLS, testes de isolamento e seeders com dados em pt-BR.
+1. **Design system** — os ~19 componentes de [`../interface/README.md`](../interface/README.md), com página de catálogo para você revisar.
+2. **Migrations, models e RLS** — com testes que provam o isolamento entre academias.
+3. **Telas de CRUD** — montadas sobre componentes prontos.
