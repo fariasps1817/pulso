@@ -46,6 +46,10 @@ app/
   Actions/Fortify/     Ações de autenticação (criar usuário, trocar senha)
   Casts/               Normalização ao gravar (caixa de título, só dígitos)
   Enums/               Situações e tipos do domínio
+  Livewire/            Telas com estado: lista, formulário, detalhes
+  Policies/            Quem pode o quê, conforme a matriz de papéis
+  Rules/               CPF válido, data brasileira
+  Services/Enderecos/  ViaCEP e IBGE, com cache e sem travar o cadastro
   Http/Middleware/     DefinirAcademiaAtual — alimenta o RLS
   Models/              16 models; Concerns/PertenceAAcademia aplica o filtro
   Providers/           AppServiceProvider, FortifyServiceProvider
@@ -169,7 +173,8 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 2a. Modelo de domínio e convenções de interface, em texto | ✅ concluída |
 | 2b. Design system — 27 componentes e o catálogo em `/catalogo` | ✅ concluída |
 | 2c. Banco: 26 migrations, 16 models e Row Level Security | ✅ concluída |
-| 3. Telas de CRUD: alunos, planos, matrículas | ⬜ próxima |
+| 3a. CRUD de alunos (Livewire) — lista, ficha e formulário | ✅ concluída |
+| 3b. CRUD de planos e matrículas | ⬜ próxima |
 | 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ |
 | 5. Controle de acesso: catraca e biometria | ⬜ |
 | 6. Radar | ⬜ |

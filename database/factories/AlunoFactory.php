@@ -24,7 +24,13 @@ final class AlunoFactory extends Factory
             // CPF gerado com dígitos verificadores válidos: cadastro de teste
             // que não passa na própria validação não serve para testar nada.
             'cpf' => self::cpfValido(),
-            'data_nascimento' => fake()->dateTimeBetween('-60 years', '-13 years')->format('Y-m-d'),
+            /*
+             * Maior de idade por padrão. Um menor gerado ao acaso viria sem
+             * responsável — dado que o formulário recusa — e faria testes
+             * passarem ou falharem conforme o sorteio. Para o caso do menor
+             * existe o estado ->menorDeIdade().
+             */
+            'data_nascimento' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
             'sexo' => fake()->randomElement(['M', 'F']),
             'email' => fake()->unique()->safeEmail(),
             'whatsapp' => '85'.fake()->numerify('#########'),

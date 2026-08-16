@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\PreferenciaController;
 use App\Http\Controllers\UnidadeAtualController;
+use App\Livewire\Alunos;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +49,23 @@ Route::middleware(['auth'])->group(function (): void {
 
     Route::post('/preferencias', [PreferenciaController::class, 'salvar'])->name('preferencias.salvar');
     Route::post('/unidade-atual', [UnidadeAtualController::class, 'trocar'])->name('painel.trocar-unidade');
+
+    /*
+     * Alunos.
+     *
+     * O caminho é sempre o mesmo: lista → detalhes → editar. Quem aprendeu a
+     * mexer em alunos sabe mexer em planos.
+     *
+     * "novo" vem antes de "{aluno}" de propósito: registrada depois, a rota
+     * com parâmetro capturaria /alunos/novo e tentaria buscar um aluno
+     * chamado "novo".
+     */
+    Route::prefix('alunos')->name('alunos.')->group(function (): void {
+        Route::get('/', Alunos\Lista::class)->name('lista');
+        Route::get('/novo', Alunos\Formulario::class)->name('novo');
+        Route::get('/{aluno}', Alunos\Detalhes::class)->name('detalhes');
+        Route::get('/{aluno}/editar', Alunos\Formulario::class)->name('editar');
+    });
 });
 
 /*

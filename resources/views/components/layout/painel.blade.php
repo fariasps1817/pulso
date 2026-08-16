@@ -18,8 +18,8 @@
 
 @php
     $itens = [
-        ['id' => 'radar', 'rotulo' => 'Radar', 'icone' => 'M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm0 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm0 3v.01', 'principal' => true],
-        ['id' => 'alunos', 'rotulo' => 'Alunos', 'icone' => 'M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7a6 6 0 0 1 12 0', 'principal' => true],
+        ['id' => 'radar', 'rotulo' => 'Radar', 'icone' => 'M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm0 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm0 3v.01', 'principal' => true, 'url' => route('painel.inicio')],
+        ['id' => 'alunos', 'rotulo' => 'Alunos', 'icone' => 'M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7a6 6 0 0 1 12 0', 'principal' => true, 'url' => route('alunos.lista')],
         ['id' => 'matriculas', 'rotulo' => 'Matrículas', 'icone' => 'M5 3h10v14l-5-3-5 3V3Z', 'principal' => false],
         ['id' => 'mensalidades', 'rotulo' => 'Mensalidades', 'icone' => 'M2.5 6.5h15v9h-15v-9Zm0 3.5h15M5.5 13h3', 'principal' => true],
         ['id' => 'planos', 'rotulo' => 'Planos', 'icone' => 'M3.5 5.5h13M3.5 10h13M3.5 14.5h8', 'principal' => false],
@@ -92,6 +92,7 @@
                 <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Navegação principal">
                     @foreach ($itens as $item)
                         <x-painel.item-navegacao
+                            :href="$item['url'] ?? '#'"
                             :rotulo="$item['rotulo']"
                             :icone="$item['icone']"
                             :ativo="$secao === $item['id']"
@@ -137,6 +138,7 @@
 
                     @foreach ($itens as $item)
                         <x-painel.item-navegacao
+                            :href="$item['url'] ?? '#'"
                             :rotulo="$item['rotulo']"
                             :icone="$item['icone']"
                             :ativo="$secao === $item['id']"
@@ -158,7 +160,7 @@
         <nav class="fixed inset-x-0 bottom-0 z-30 flex border-t border-borda bg-superficie lg:hidden"
              aria-label="Atalhos">
             @foreach ($principais as $item)
-                <a href="#"
+                <a href="{{ $item['url'] ?? '#' }}"
                    @if ($secao === $item['id']) aria-current="page" @endif
                    class="flex min-h-toque flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs
                           transition-colors

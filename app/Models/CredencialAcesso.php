@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\TipoCredencial;
 use App\Models\Concerns\PertenceAAcademia;
+use Database\Factories\CredencialAcessoFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -18,6 +20,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class CredencialAcesso extends Model
 {
+    /** @use HasFactory<CredencialAcessoFactory> */
+    use HasFactory;
+
     use PertenceAAcademia;
 
     protected $table = 'credenciais_acesso';

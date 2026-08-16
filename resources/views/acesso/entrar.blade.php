@@ -29,7 +29,7 @@
             :obrigatorio="true"
             autocomplete="username"
             autofocus
-            placeholder="voce@academia.com.br"
+            placeholder="voce@academia.com.br" 
         />
 
         <div class="flex flex-col gap-1.5">
@@ -38,6 +38,7 @@
 
                 @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::resetPasswords()))
                     <a href="{{ route('password.request') }}"
+                       tabindex="-1"
                        class="rounded-sm text-sm text-acao hover:underline
                               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco">
                         Esqueci a senha

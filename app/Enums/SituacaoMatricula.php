@@ -23,6 +23,23 @@ enum SituacaoMatricula: string
         };
     }
 
+    /**
+     * Qual pílula representa esta situação na tela.
+     *
+     * Experiência NÃO é verde: verde significa "em dia, nada a fazer", e
+     * experiência é justamente o contrário — é um prazo correndo, que vira
+     * matrícula ou vira aluno perdido. Âmbar diz "olhe para isto".
+     */
+    public function pilula(): string
+    {
+        return match ($this) {
+            self::Ativa => 'pago',
+            self::Experiencia => 'avencer',
+            self::Suspensa => 'frequencia',
+            self::Encerrada, self::Cancelada => 'vencido',
+        };
+    }
+
     /** Gera mensalidade todo mês? Trancada e encerrada não geram. */
     public function geraMensalidade(): bool
     {

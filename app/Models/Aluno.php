@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Casts\ApenasDigitos;
 use App\Casts\CaixaDeTitulo;
+use App\Enums\SituacaoMatricula;
 use App\Models\Concerns\PertenceAAcademia;
 use App\Support\Documentos;
 use Carbon\CarbonImmutable;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -60,6 +62,25 @@ final class Aluno extends Model
     public function matriculas(): HasMany
     {
         return $this->hasMany(Matricula::class);
+    }
+
+    /**
+     * A matrícula em vigor — ativa ou em experiência.
+     *
+     * Existe para a lista de alunos mostrar a situação sem uma consulta por
+     * linha: com `with('matriculaVigente')`, 300 alunos custam duas consultas
+     * em vez de trezentas e uma.
+     *
+     * @return HasOne<Matricula, $this>
+     */
+    public function matriculaVigente(): HasOne
+    {
+        return $this->hasOne(Matricula::class)
+            ->whereIn('situacao', [
+                SituacaoMatricula::Ativa->value,
+                SituacaoMatricula::Experiencia->value,
+            ])
+            ->latestOfMany('inicio_em');
     }
 
     /** @return HasMany<Mensalidade, $this> */
