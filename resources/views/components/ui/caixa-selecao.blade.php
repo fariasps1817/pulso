@@ -1,4 +1,6 @@
 @props([
+    /* Quanto o campo ocupa na grade: 25, 50, 75 ou 100. */
+    'largura' => '100',
     'nome',
     'rotulo',
     'valor' => '1',
@@ -14,7 +16,7 @@
     $estaMarcado = (bool) old($nome, $marcado);
 @endphp
 
-<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :campo-id="$id" sem-rotulo>
+<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :campo-id="$id" :largura="$largura" sem-rotulo>
     <label for="{{ $id }}" class="flex min-h-toque cursor-pointer items-center gap-3 text-texto">
         <input
             type="checkbox"

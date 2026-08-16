@@ -109,10 +109,34 @@ Toda entidade segue o mesmo caminho. Quem aprendeu a mexer em alunos sabe mexer 
 
 **Formulário**
 - Usado tanto para criar quanto para editar — mesma tela, mesmo layout.
-- Uma coluna. Duas colunas em tela de balcão só quando os campos são curtos e relacionados.
+- Campos em grade de quartos — ver §3.1.
 - **Salvar** fixo no rodapé em telas longas: rolar até o fim para salvar é motivo de cadastro perdido.
 - Confirmação ao sair com alteração não salva.
 - Exclusão sempre com modal que diz o que será perdido, e digitando o nome quando for irreversível.
+
+### 3.1 Grade de formulário: quartos
+
+Todo formulário usa `<x-ui.grade-formulario>`, que é uma grade de **quatro colunas** no desktop. Cada campo declara quanto ocupa:
+
+| `largura` | Ocupa | Para quê |
+|---|---|---|
+| `25` | ¼ | CPF, data, telefone, CEP, número, estado |
+| `50` | ½ | E-mail, rua, bairro, complemento |
+| `75` | ¾ | Nome completo, cidade |
+| `100` | tudo | Observações, campos longos |
+
+```blade
+<x-ui.grade-formulario>
+    <x-ui.campo   largura="75" nome="nome" rotulo="Nome completo" />
+    <x-ui.selecao largura="25" nome="sexo" rotulo="Sexo" :opcoes="$sexos" />
+</x-ui.grade-formulario>
+```
+
+**A largura acompanha o conteúdo esperado.** "Sexo" tem três opções e não merece o mesmo espaço de um nome completo — campo largo demais sugere que cabe mais texto do que cabe. Quatro campos curtos numa linha (CPF, nascimento, WhatsApp, telefone) leem melhor do que dois pares empilhados.
+
+No celular tudo vira **uma coluna só**, qualquer que seja a largura declarada: uma fração de 4 numa tela de 360 px produziria campo intocável.
+
+**Nenhum formulário escreve `grid-cols` à mão.** As classes de span vivem em `x-ui.grupo-campo`, escritas literalmente — o Tailwind varre o código-fonte, e uma classe montada em tempo de execução nunca seria gerada, deixando o campo sem largura nenhuma.
 
 ---
 
@@ -159,6 +183,7 @@ Todos visíveis em **`/catalogo`** (fora de produção), nos dois temas.
 | Interruptor | `x-ui.interruptor` | ✅ |
 | Envio de imagem | `x-ui.envio-imagem` | ✅ |
 | Invólucro de campo | `x-ui.grupo-campo` | ✅ |
+| Grade de formulário | `x-ui.grade-formulario` | ✅ |
 | Pílula de estado | `x-ui.pilula` | ✅ |
 | Cartão | `x-ui.cartao` | ✅ |
 | Aviso | `x-ui.aviso` | ✅ |

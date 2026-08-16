@@ -1,4 +1,6 @@
 @props([
+    /* Quanto o campo ocupa na grade: 25, 50, 75 ou 100. */
+    'largura' => '100',
     'nome',
     'rotulo',
     'valor' => null,
@@ -16,7 +18,7 @@
     ]))) ?: null;
 @endphp
 
-<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :obrigatorio="$obrigatorio" :campo-id="$id">
+<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :obrigatorio="$obrigatorio" :campo-id="$id" :largura="$largura">
     <textarea
         id="{{ $id }}"
         name="{{ $nome }}"

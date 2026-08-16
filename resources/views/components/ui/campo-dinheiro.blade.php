@@ -1,4 +1,6 @@
 @props([
+    /* Quanto o campo ocupa na grade: 25, 50, 75 ou 100. */
+    'largura' => '100',
     'nome',
     'rotulo',
     'valor' => null,
@@ -29,7 +31,7 @@
         : number_format((float) $valorInicial, 2, ',', '.');
 @endphp
 
-<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :obrigatorio="$obrigatorio" :campo-id="$id">
+<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :obrigatorio="$obrigatorio" :campo-id="$id" :largura="$largura">
     <div class="relative">
         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-texto-mudo"
               aria-hidden="true">R$</span>

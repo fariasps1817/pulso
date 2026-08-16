@@ -9,14 +9,28 @@
     /* Alguns controles (caixa de selecao, interruptor) trazem o proprio
        rotulo ao lado, entao o rotulo de cima seria repeticao. */
     'semRotulo' => false,
+    /* Quanto o campo ocupa na grade de formulario: 25, 50, 75 ou 100. */
+    'largura' => '100',
 ])
 
 @php
     $id = $campoId ?? $nome;
     $temErro = $errors->has($nome);
+
+    /*
+     * As classes precisam aparecer literais aqui: o Tailwind varre o codigo
+     * fonte, e uma classe montada em tempo de execucao ("md:col-span-{$n}")
+     * nunca seria gerada — o campo sairia sem largura nenhuma.
+     */
+    $colunas = [
+        '25' => 'md:col-span-1',
+        '50' => 'md:col-span-2',
+        '75' => 'md:col-span-3',
+        '100' => 'md:col-span-4',
+    ][(string) $largura] ?? 'md:col-span-4';
 @endphp
 
-<div {{ $attributes->merge(['class' => 'flex flex-col gap-1.5']) }}>
+<div {{ $attributes->merge(['class' => 'flex flex-col gap-1.5 '.$colunas]) }}>
     @unless ($semRotulo)
         <label for="{{ $id }}" class="text-sm font-medium text-texto-2">
             {{ $rotulo }}

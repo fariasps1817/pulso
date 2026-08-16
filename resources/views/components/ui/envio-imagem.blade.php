@@ -1,4 +1,6 @@
 @props([
+    /* Quanto o campo ocupa na grade: 25, 50, 75 ou 100. */
+    'largura' => '100',
     'nome',
     'rotulo',
     'ajuda' => 'JPG ou PNG, até 2 MB.',
@@ -24,7 +26,7 @@
     $proporcao = $formato === 'quadrado' ? 'aspect-square w-32' : 'aspect-[3/1] w-full max-w-sm';
 @endphp
 
-<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :obrigatorio="$obrigatorio" :campo-id="$id">
+<x-ui.grupo-campo :nome="$nome" :rotulo="$rotulo" :ajuda="$ajuda" :obrigatorio="$obrigatorio" :campo-id="$id" :largura="$largura">
     <div x-data="{
         previa: @js($atual),
         escolher(evento) {

@@ -177,6 +177,12 @@
                 <strong class="text-texto">Teste no celular:</strong> o teclado que sobe é o numérico.
             </p>
 
+            <p class="prosa mt-4 text-texto-2">
+                Os campos vivem numa <strong class="text-texto">grade de quatro colunas</strong>, e cada um
+                declara se ocupa 25, 50, 75 ou 100 por cento. A largura acompanha o conteúdo esperado —
+                "Sexo" não merece o mesmo espaço de um nome completo.
+            </p>
+
             <div class="mt-8 grid gap-6 md:grid-cols-2">
                 <x-ui.campo nome="nome_exemplo" rotulo="Nome completo" placeholder="Jose Maria da Silva"
                             ajuda="Gravado em caixa de título, digite como digitar." />

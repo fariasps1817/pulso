@@ -17,21 +17,32 @@
                 o controle de menor de idade e a cobrança.
             </p>
 
-            <div class="mt-6 grid gap-5 md:grid-cols-2">
-                <div class="md:col-span-2">
-                    <x-ui.campo
-                        nome="nome"
-                        rotulo="Nome completo"
-                        wire:model.blur="nome"
-                        placeholder="Jose Maria da Silva"
-                        ajuda="Gravado em caixa de título — digite como preferir."
-                        autocomplete="off"
-                    />
-                </div>
+            {{-- A largura acompanha o conteúdo: "Sexo" tem três opções e não
+                 merece o mesmo espaço de um nome completo. --}}
+            <x-ui.grade-formulario class="mt-6">
+                <x-ui.campo
+                    largura="75"
+                    nome="nome"
+                    rotulo="Nome completo"
+                    wire:model.blur="nome"
+                    placeholder="Jose Maria da Silva"
+                    ajuda="Gravado em caixa de título — digite como preferir."
+                    autocomplete="off"
+                />
 
-                <x-ui.campo-mascara nome="cpf" rotulo="CPF" formato="cpf" wire:model.blur="cpf" />
+                <x-ui.selecao
+                    largura="25"
+                    nome="sexo"
+                    rotulo="Sexo"
+                    :obrigatorio="false"
+                    wire:model="sexo"
+                    :opcoes="['M' => 'Masculino', 'F' => 'Feminino']"
+                />
+
+                <x-ui.campo-mascara largura="25" nome="cpf" rotulo="CPF" formato="cpf" wire:model.blur="cpf" />
 
                 <x-ui.campo-mascara
+                    largura="25"
                     nome="data_nascimento"
                     rotulo="Data de nascimento"
                     formato="data"
@@ -39,9 +50,11 @@
                     ajuda="Digitada, sem calendário."
                 />
 
-                <x-ui.campo-mascara nome="whatsapp" rotulo="WhatsApp" formato="celular" wire:model.blur="whatsapp" />
+                <x-ui.campo-mascara largura="25" nome="whatsapp" rotulo="WhatsApp" formato="celular"
+                                    wire:model.blur="whatsapp" />
 
                 <x-ui.campo-mascara
+                    largura="25"
                     nome="telefone"
                     rotulo="Telefone"
                     formato="celular"
@@ -50,6 +63,7 @@
                 />
 
                 <x-ui.campo
+                    largura="50"
                     nome="email"
                     rotulo="E-mail"
                     tipo="email"
@@ -57,15 +71,7 @@
                     wire:model.blur="email"
                     placeholder="aluno@email.com"
                 />
-
-                <x-ui.selecao
-                    nome="sexo"
-                    rotulo="Sexo"
-                    :obrigatorio="false"
-                    wire:model="sexo"
-                    :opcoes="['M' => 'Masculino', 'F' => 'Feminino']"
-                />
-            </div>
+            </x-ui.grade-formulario>
         </x-ui.cartao>
 
         {{-- ==================== Responsável ====================
@@ -86,18 +92,18 @@
                     </div>
                 </div>
 
-                <div class="mt-6 grid gap-5 md:grid-cols-2">
-                    <div class="md:col-span-2">
-                        <x-ui.campo nome="responsavel_nome" rotulo="Nome do responsável" wire:model.blur="responsavel_nome" />
-                    </div>
+                <x-ui.grade-formulario class="mt-6">
+                    <x-ui.campo largura="50" nome="responsavel_nome" rotulo="Nome do responsável"
+                                wire:model.blur="responsavel_nome" />
 
-                    <x-ui.campo-mascara nome="responsavel_cpf" rotulo="CPF do responsável" formato="cpf"
+                    <x-ui.campo-mascara largura="25" nome="responsavel_cpf" rotulo="CPF do responsável" formato="cpf"
                                         wire:model.blur="responsavel_cpf" />
 
-                    <x-ui.campo-mascara nome="responsavel_telefone" rotulo="Telefone do responsável" formato="celular"
-                                        wire:model.blur="responsavel_telefone" />
+                    <x-ui.campo-mascara largura="25" nome="responsavel_telefone" rotulo="Telefone do responsável"
+                                        formato="celular" wire:model.blur="responsavel_telefone" />
 
                     <x-ui.selecao
+                        largura="25"
                         nome="responsavel_parentesco"
                         rotulo="Parentesco"
                         wire:model="responsavel_parentesco"
@@ -113,7 +119,7 @@
                             'Responsável legal' => 'Responsável legal',
                         ]"
                     />
-                </div>
+                </x-ui.grade-formulario>
             </x-ui.cartao>
         @endif
 
@@ -122,52 +128,43 @@
             <h2 class="text-lg text-texto">Endereço</h2>
             <p class="mt-1 text-sm text-texto-mudo">Opcional. O CEP preenche o resto.</p>
 
-            <div class="mt-6 grid gap-5 md:grid-cols-6">
-                <div class="md:col-span-2">
-                    <x-ui.campo-mascara
-                        nome="cep"
-                        rotulo="CEP"
-                        formato="cep"
-                        :obrigatorio="false"
-                        wire:model.live.debounce.300ms="cep"
-                        :ajuda="$avisoCep ?: 'Preenche o endereço sozinho.'"
-                    />
+            <x-ui.grade-formulario class="mt-6">
+                <x-ui.campo-mascara
+                    largura="25"
+                    nome="cep"
+                    rotulo="CEP"
+                    formato="cep"
+                    :obrigatorio="false"
+                    wire:model.live.debounce.300ms="cep"
+                    :ajuda="$avisoCep ?: 'Preenche o endereço sozinho.'"
+                />
 
-                    <div wire:loading wire:target="cep" class="mt-1 text-sm text-texto-mudo">buscando endereço…</div>
-                </div>
+                <x-ui.campo largura="50" nome="logradouro" rotulo="Rua" :obrigatorio="false"
+                            wire:model.blur="logradouro" />
 
-                <div class="md:col-span-3">
-                    <x-ui.campo nome="logradouro" rotulo="Rua" :obrigatorio="false" wire:model.blur="logradouro" />
-                </div>
+                <x-ui.campo largura="25" nome="numero" rotulo="Número" :obrigatorio="false" wire:model.blur="numero" />
 
-                <x-ui.campo nome="numero" rotulo="Número" :obrigatorio="false" wire:model.blur="numero" />
+                <x-ui.campo largura="50" nome="complemento" rotulo="Complemento" :obrigatorio="false"
+                            wire:model.blur="complemento" placeholder="Apto, bloco, referência" />
 
-                <div class="md:col-span-3">
-                    <x-ui.campo nome="complemento" rotulo="Complemento" :obrigatorio="false"
-                                wire:model.blur="complemento" placeholder="Apto, bloco, referência" />
-                </div>
-
-                <div class="md:col-span-3">
-                    <x-ui.campo nome="bairro" rotulo="Bairro" :obrigatorio="false" wire:model.blur="bairro" />
-                </div>
+                <x-ui.campo largura="50" nome="bairro" rotulo="Bairro" :obrigatorio="false" wire:model.blur="bairro" />
 
                 {{-- UF e cidade vêm do IBGE, nunca de digitação livre: texto
                      livre produz "Fortaleza", "fortaleza" e "Frotaleza" na
                      mesma base, e nenhum relatório por cidade funciona depois. --}}
-                <div class="md:col-span-2">
-                    <x-ui.selecao nome="uf" rotulo="Estado" :obrigatorio="false" wire:model.live="uf" :opcoes="$estados" />
-                </div>
+                <x-ui.selecao largura="25" nome="uf" rotulo="Estado" :obrigatorio="false"
+                              wire:model.live="uf" :opcoes="$estados" />
 
-                <div class="md:col-span-4">
-                    @if ($municipios === [])
-                        <x-ui.campo nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model.blur="cidade"
-                                    :ajuda="$uf === '' ? 'Escolha o estado primeiro.' : 'Lista do IBGE indisponível — digite à mão.'" />
-                    @else
-                        <x-ui.selecao nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model="cidade"
-                                      :opcoes="array_combine($municipios, $municipios)" />
-                    @endif
-                </div>
-            </div>
+                @if ($municipios === [])
+                    <x-ui.campo largura="75" nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model.blur="cidade"
+                                :ajuda="$uf === '' ? 'Escolha o estado primeiro.' : 'Lista do IBGE indisponível — digite à mão.'" />
+                @else
+                    <x-ui.selecao largura="75" nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model="cidade"
+                                  :opcoes="array_combine($municipios, $municipios)" />
+                @endif
+            </x-ui.grade-formulario>
+
+            <div wire:loading wire:target="cep" class="mt-2 text-sm text-texto-mudo">buscando endereço…</div>
         </x-ui.cartao>
 
         {{-- ==================== Observações ==================== --}}
