@@ -17,6 +17,15 @@ Versão 1 — agosto/2026.
 | Vencimento da mensalidade | **Dia fixo escolhido pelo aluno** na matrícula |
 | Escopo desta versão | Cadastros, financeiro, controle de acesso e Radar. Sem aulas/turmas, sem treino/avaliação física, sem caixa/contas a pagar |
 | Identificação na catraca | Reconhecimento facial, digital e cartão/chaveiro |
+| CPF do aluno | **Obrigatório**, com validação matemática dos dígitos |
+| Data de nascimento | **Obrigatória**, validada por faixa de idade |
+| WhatsApp do aluno | **Obrigatório** — é o canal de cobrança e a base da lista de aniversariantes |
+| Primeiro mês | **Não é proporcional.** Existe período de experiência antes; a matrícula só começa com contrato assinado |
+| Tolerância na catraca | 5 dias após o vencimento, configurável por academia |
+| Multa por cancelamento | Campo existe, padrão zero |
+| Área "Meu Pulso" | Fora desta versão, mas o cadastro já nasce preparado |
+| Sessão do usuário | Única por padrão; login novo derruba a sessão anterior |
+| Super administrador | Área própria para gerenciar as academias |
 
 **Fora do escopo, por decisão:** aulas coletivas e turmas, ficha de treino, avaliação física, caixa diário, contas a pagar, venda de produtos, comissão de professor. Não é "esquecido" — é adiado, e o modelo abaixo não impede acrescentar depois.
 
@@ -78,17 +87,27 @@ Convenções aplicadas a todas: chave `bigint` gerada por identidade, `created_a
 
 ### 4.1 Estrutura da academia
 
-**`academias`** — o cliente do Pulso.
+**`academias`** — o cliente do Pulso. É também a tela de configurações que a academia edita, e a fonte dos dados que saem nos PDFs (contrato, recibo, relatório).
 
 | Campo | Tipo | Observação |
 |---|---|---|
 | `nome` | text | Nome fantasia |
-| `razao_social` | text, nulo | |
+| `razao_social` | text, nulo | Sai no contrato |
 | `cnpj` | text, nulo, único | Nulo permite cadastrar antes de ter CNPJ |
-| `email` | text | Contato administrativo |
-| `telefone` | text | |
-| `ativa` | boolean | Academia inadimplente com o Pulso é desativada, não apagada |
+| `email`, `telefone`, `whatsapp` | text | Contato administrativo |
+| `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `uf` | text, nulo | Cabeçalho dos PDFs |
+| `logo_path` | text, nulo | Logo da academia nos PDFs — **não** substitui a marca Pulso na interface |
+| `dias_tolerancia_bloqueio` | smallint | Padrão 5. Depois do vencimento, quantos dias a catraca ainda libera |
+| `dias_baixa_frequencia` | smallint | Padrão 15. A partir de quantos dias sem passar na catraca o aluno entra no Radar |
+| `idade_minima` | smallint | Padrão a definir — ver §7.1 |
+| **Controle do SaaS** — só o super administrador altera | | |
+| `situacao` | text | `ativa`, `em_aviso`, `bloqueada`, `cancelada` — ver §5.6 |
+| `assinatura_vence_em` | date, nulo | |
+| `bloqueada_em` | timestamptz, nulo | |
+| `motivo_bloqueio` | text, nulo | Visível ao super administrador, não à academia |
 | `criada_em` | timestamptz | |
+
+> **Duas metades na mesma tabela.** A primeira a academia edita nas configurações; a segunda só o super administrador toca. A separação é de permissão, não de tabela — dividir em duas obrigaria a um `join` em toda tela.
 
 **`unidades`** — filiais.
 
@@ -108,22 +127,79 @@ Convenções aplicadas a todas: chave `bigint` gerada por identidade, `created_a
 
 | Campo | Tipo | Observação |
 |---|---|---|
-| `academia_id` | bigint, nulo | Nulo = equipe do Pulso (suporte), que não pertence a academia nenhuma |
+| `academia_id` | bigint, nulo | **Nulo = super administrador** (equipe do Pulso), que não pertence a academia nenhuma |
 | `name`, `email`, `password` | | Do Laravel |
-| `tema` | text | `claro`, `escuro` ou `sistema` — guardado no perfil, não só no navegador |
+| `preferencias` | jsonb | Tema, estado da barra lateral, itens por página, colunas visíveis. Ver §5.7 |
+| `sessao_unica` | boolean | **Padrão verdadeiro.** Login novo derruba a sessão anterior |
+| `minutos_inatividade` | smallint, nulo | Nulo usa o padrão do sistema |
 | `ativo` | boolean | Demitiu, desativa. Nunca apaga, senão o histórico perde o autor |
+| `bloqueado_ate` | timestamptz, nulo | Preenchido pelo bloqueio por tentativas — ver §5.8 |
 | `ultimo_acesso_em` | timestamptz, nulo | |
 
 **`unidade_user`** — a quais unidades cada usuário tem acesso. Sem linha aqui, o usuário enxerga todas as unidades da academia (caso do dono).
 
-**Papéis** (via `spatie/laravel-permission`, com times = academia):
+**`tentativas_login`** — trilha de auditoria das tentativas.
 
-| Papel | O que faz |
-|---|---|
-| `dono` | Tudo, em todas as unidades. Vê o consolidado da rede. |
-| `gerente` | Tudo nas unidades a que tem acesso. Não mexe em usuários nem em planos. |
-| `recepcao` | Cadastra aluno, matricula, registra pagamento, emite Pix. Não vê relatório financeiro consolidado. |
-| `professor` | Vê os alunos da unidade e a frequência. Não vê nada de dinheiro. |
+| Campo | Tipo | Observação |
+|---|---|---|
+| `email` | text | O que foi digitado, mesmo se não existir |
+| `ip` | inet | |
+| `agente` | text, nulo | Navegador |
+| `sucesso` | boolean | |
+| `ocorreu_em` | timestamptz | |
+
+> O bloqueio em si acontece no limitador de taxa (rápido, em cache). Esta tabela existe para responder depois *"quem tentou entrar na conta da recepção às 3 da manhã?"* — pergunta que o cache não responde.
+
+**`sessions`** — a tabela padrão do Laravel, necessária para a sessão única e para o timeout. Exige `SESSION_DRIVER=database` (hoje está em `file`) ou Redis com rastreamento.
+
+### 4.2.1 Papéis e o que cada um enxerga
+
+Via `spatie/laravel-permission`, com times = academia.
+
+| Tela / ação | Super admin | Dono | Gerente | Recepção | Professor |
+|---|:--:|:--:|:--:|:--:|:--:|
+| Academias (criar, bloquear, avisar) | ✅ | — | — | — | — |
+| Configurações da academia | ✅ | ✅ | 👁 | — | — |
+| Unidades | ✅ | ✅ | 👁 | — | — |
+| Usuários e papéis | ✅ | ✅ | — | — | — |
+| Planos | ✅ | ✅ | 👁 | 👁 | — |
+| Alunos — listar e ver | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Alunos — criar e editar | — | ✅ | ✅ | ✅ | — |
+| Alunos — excluir | — | ✅ | ✅ | — | — |
+| Matrículas | — | ✅ | ✅ | ✅ | 👁 |
+| Mensalidades — ver | — | ✅ | ✅ | ✅ | — |
+| Mensalidades — receber, estornar | — | ✅ | ✅ | ✅ | — |
+| Biometria — cadastrar | — | ✅ | ✅ | ✅ | — |
+| Catracas e dispositivos | — | ✅ | ✅ | — | — |
+| Radar | — | ✅ | ✅ | 👁 parcial | — |
+| Relatório financeiro | — | ✅ | ✅ | — | — |
+| Frequência dos alunos | — | ✅ | ✅ | ✅ | ✅ |
+| Consolidado da rede | — | ✅ | — | — | — |
+
+✅ pode agir · 👁 só visualiza · — não vê a tela
+
+Três regras que sustentam a tabela:
+
+1. **Professor não vê dinheiro.** Nem valor de plano, nem mensalidade, nem quem está devendo. Vê aluno e frequência.
+2. **Recepção vê a inadimplência do aluno na ficha, mas não o relatório financeiro consolidado** — precisa saber para atender, não para conhecer o faturamento.
+3. **Gerente atua só nas unidades a que está vinculado**; dono enxerga a rede inteira.
+
+### 4.2.2 Super administrador
+
+O super administrador (`users.academia_id` nulo) **não enxerga dados de aluno, mensalidade ou biometria de academia nenhuma** — nem por engano, porque as políticas de RLS não têm exceção para ele.
+
+Ele opera apenas sobre o que chamamos de **plano de controle**: `academias`, `unidades`, `avisos_academia` e os usuários. Essas tabelas não têm política de isolamento por academia.
+
+**`avisos_academia`** — o recado que aparece na tela da academia.
+
+| Campo | Tipo | Observação |
+|---|---|---|
+| `academia_id` | bigint, nulo | Nulo = aviso para todas |
+| `tipo` | text | `informativo`, `atencao`, `bloqueio_iminente` |
+| `titulo`, `mensagem` | text | |
+| `exibir_de`, `exibir_ate` | date | |
+| `dispensavel` | boolean | Se o usuário pode fechar o aviso |
+| `criado_por` | bigint | |
 
 **`profissionais`** — professores e instrutores.
 
@@ -144,13 +220,13 @@ Convenções aplicadas a todas: chave `bigint` gerada por identidade, `created_a
 | Campo | Tipo | Observação |
 |---|---|---|
 | `academia_id` | bigint | |
-| `nome` | text | |
-| `cpf` | text, nulo | Único por academia quando preenchido. Ver pendência §7.1 |
-| `data_nascimento` | date | Define se é menor de idade |
+| `nome` | text | Gravado em caixa de título — ver §5.9 |
+| `cpf` | text | **Obrigatório**, 11 dígitos, único por academia, dígitos verificadores conferidos |
+| `data_nascimento` | date | **Obrigatória**, validada por faixa — ver §5.10 |
 | `sexo` | text, nulo | |
-| `email` | text, nulo | |
+| `email` | text, nulo | Único por academia quando preenchido, para servir de login no "Meu Pulso" depois |
 | `telefone` | text, nulo | |
-| `whatsapp` | text, nulo | Separado do telefone: nem todo telefone recebe WhatsApp |
+| `whatsapp` | text | **Obrigatório** — canal de cobrança e base da lista de aniversariantes |
 | `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `uf` | text, nulo | |
 | `foto_path` | text, nulo | Foto de identificação da recepção — **não** é template biométrico |
 | `observacoes` | text, nulo | |
@@ -172,8 +248,12 @@ Convenções aplicadas a todas: chave `bigint` gerada por identidade, `created_a
 | `duracao_meses` | smallint | 1 = mensal; 3, 6, 12 = com prazo |
 | `taxa_matricula` | numeric(10,2) | Zero quando não há |
 | `acesso_todas_unidades` | boolean | Falso = só a unidade da matrícula |
-| `dias_experiencia` | smallint | Quantos dias de teste esse plano concede |
+| `multa_cancelamento` | numeric(10,2) | Padrão zero. Quem não usa, não vê o campo |
+| `dias_experiencia` | smallint | Teto de 30. Zero = plano sem experiência |
+| `sessoes_experiencia` | smallint | Quantas passagens na catraca o teste permite. Zero = sem limite de sessões |
 | `ativo` | boolean | Plano descontinuado não some: matrículas antigas apontam para ele |
+
+> **A experiência acaba pelo que vier primeiro:** os dias ou as sessões. Uma academia usa "7 dias", outra usa "3 aulas experimentais", e uma terceira usa os dois. Os dois campos existirem custa duas colunas; faltar um obriga a refazer a regra depois.
 
 **`matriculas`** — o vínculo aluno ↔ plano ↔ unidade.
 
@@ -182,6 +262,8 @@ Convenções aplicadas a todas: chave `bigint` gerada por identidade, `created_a
 | `academia_id`, `unidade_id`, `aluno_id`, `plano_id` | bigint | |
 | `tipo` | text | `experiencia` ou `regular` |
 | `situacao` | text | Ver máquina de estados em §5.1 |
+| `contrato_assinado_em` | date, nulo | **Matrícula regular não existe sem isto** — ver §5.2 |
+| `sessoes_usadas` | smallint | Só na experiência: quantas passagens já foram consumidas |
 | `inicio_em` | date | |
 | `fim_previsto_em` | date, nulo | `inicio + duracao_meses`; nulo em plano sem prazo |
 | `encerrada_em` | date, nulo | |
@@ -345,14 +427,25 @@ CREATE INDEX mensalidades_em_aberto
 | `encerrada` | Acabou o prazo ou o aluno saiu | Bloqueia |
 | `cancelada` | Desfeita por erro de cadastro | Bloqueia. Não gera mensalidade |
 
-### 5.2 Geração da mensalidade
+### 5.2 Da experiência à primeira mensalidade
 
-1. O aluno escolhe o **dia de vencimento na matrícula**, entre **1 e 28**.
-   *Por quê 28:* dia 31 não existe em fevereiro. Aceitar 29–31 obrigaria a uma regra de ajuste ("cai no último dia do mês") que a recepção teria de explicar toda vez. Limitar a 28 elimina o caso.
-2. Uma rotina diária gera a mensalidade do mês seguinte para toda matrícula `ativa`, com antecedência configurável.
-3. `competencia` é o primeiro dia do mês de referência; `vencimento` é `competencia` + o dia escolhido.
-4. Matrícula `suspensa` ou `encerrada` **não gera** mensalidade.
-5. A rotina é **idempotente**: rodar duas vezes no mesmo dia não duplica. Garantido por índice único em (`matricula_id`, `competencia`).
+**Não existe cobrança proporcional.** A sequência é:
+
+1. **Experiência** — matrícula `tipo = experiencia`, sem mensalidade nenhuma. Acaba pelo que vier primeiro: os `dias_experiencia` ou as `sessoes_experiencia` do plano. Teto absoluto de 30 dias.
+2. **Conversão** — a recepção registra o contrato assinado (`contrato_assinado_em`). Sem essa data, a matrícula regular não pode ser criada. A regra vive no banco, não na tela.
+3. **Primeiro vencimento** — a recepção escolhe entre:
+   - **30 dias após o início** (ex.: começou 22/03, vence 21/04, depois todo dia 21); ou
+   - **dia fixo do mês** (ex.: dia 5), com a primeira mensalidade caindo no próximo dia 5.
+
+O `dia_vencimento` da matrícula fica entre **1 e 28**.
+*Por quê 28:* dia 31 não existe em fevereiro. Aceitar 29–31 obrigaria a uma regra de ajuste ("cai no último dia do mês") que a recepção teria de explicar toda vez. Limitar a 28 elimina o caso.
+
+**Geração automática:**
+
+4. Uma rotina diária gera a mensalidade do mês seguinte para toda matrícula `ativa`.
+5. `competencia` é o primeiro dia do mês de referência; `vencimento` é `competencia` + o dia escolhido.
+6. Matrícula `experiencia`, `suspensa`, `encerrada` ou `cancelada` **não gera** mensalidade.
+7. A rotina é **idempotente**: rodar duas vezes no mesmo dia não duplica. Garantido por índice único em (`matricula_id`, `competencia`).
 
 ### 5.3 Estados da mensalidade
 
@@ -387,60 +480,145 @@ Nenhuma tabela nova — são quatro consultas:
 
 > Baixa frequência é roxo de propósito: é risco de perder o aluno, não problema de caixa. Misturar com o vermelho faria a gestão tratar as duas coisas do mesmo jeito.
 
+Some junto, sem tabela nova: **aniversariantes do dia** — `alunos` com `data_nascimento` no dia e matrícula ativa. É por isso que a data de nascimento é obrigatória.
+
+### 5.6 Situação da academia perante o Pulso
+
+| Situação | O que acontece |
+|---|---|
+| `ativa` | Uso normal |
+| `em_aviso` | Funciona igual, mas aparece o aviso do super administrador no topo de toda tela |
+| `bloqueada` | Ninguém da academia entra. A catraca **continua liberando quem está em dia** — deixar aluno na porta por briga comercial entre a academia e o Pulso seria punir quem não tem nada com isso |
+| `cancelada` | Encerrada. Dados preservados pelo prazo legal, acesso encerrado |
+
+O super administrador nunca apaga uma academia: muda a situação.
+
+### 5.7 Preferências do usuário
+
+Guardadas em `users.preferencias` (JSONB), aplicadas no login em qualquer aparelho:
+
+```json
+{
+  "tema": "escuro",
+  "sidebar_recolhida": true,
+  "itens_por_pagina": 25,
+  "unidade_padrao": 3
+}
+```
+
+> **JSONB e não colunas** porque essa lista vai crescer (colunas visíveis por tabela, ordenação preferida, filtros salvos), e cada preferência nova viraria uma migration. Preferência não é consultada em `WHERE` — só é lida junto com o usuário.
+
+O tema já é guardado no navegador para não piscar antes da primeira pintura; o valor do perfil é o que manda quando o usuário entra em outro aparelho.
+
+### 5.8 Segurança de acesso
+
+**Bloqueio por tentativas** — dois limitadores independentes, porque atacam de dois jeitos:
+
+| Limitador | Regra | Por quê |
+|---|---|---|
+| Por e-mail + IP | 5 tentativas por minuto | Padrão do Fortify: alguém errando a própria senha |
+| Por e-mail | 10 tentativas em 15 min, depois `bloqueado_ate` por 30 min | Ataque distribuído contra **uma** conta, vindo de vários IPs |
+| Por IP | 30 tentativas em 15 min | Varredura testando **vários** e-mails do mesmo lugar |
+
+Toda tentativa vai para `tentativas_login`, com sucesso ou não. A mensagem ao usuário **nunca** diz se o e-mail existe.
+
+**Timeout de inatividade** — sessão encerrada após N minutos sem requisição (padrão do sistema, ajustável por usuário em `minutos_inatividade`). A tela avisa antes de derrubar, para ninguém perder um cadastro pela metade.
+
+**Sessão única** — `users.sessao_unica`, verdadeiro por padrão. Ao entrar, as demais sessões daquele usuário são invalidadas e a outra tela cai no próximo clique, com o aviso *"Sua conta foi acessada em outro aparelho."*
+
+> Depende de `SESSION_DRIVER=database` (ou Redis com rastreamento). Hoje o ambiente local está em `file`, que não permite listar nem invalidar sessão alheia. **Mudança necessária antes de implementar.**
+
+### 5.9 Como os nomes são gravados
+
+Nome de pessoa, de unidade e de plano é gravado em **caixa de título brasileira**, independentemente de como foi digitado:
+
+| Digitado | Gravado |
+|---|---|
+| `JOSE MARIA DA SILVA` | `Jose Maria da Silva` |
+| `joSE MAria dA siLVA` | `Jose Maria da Silva` |
+| `maria dos santos e souza` | `Maria dos Santos e Souza` |
+| `luiz d'avila` | `Luiz D'Avila` |
+
+Regras: primeira letra de cada palavra em maiúscula, **exceto** as conectivas `da, das, de, do, dos, e, di, du, van, von, y` — que ficam minúsculas **salvo quando são a primeira palavra**. Acentuação digitada é preservada.
+
+A normalização acontece **ao gravar** (mutator no model), não na exibição: assim a busca, a ordenação e o PDF veem sempre o mesmo texto. Se ficasse só na exibição, a lista ordenada misturaria `SILVA` e `Silva`.
+
+### 5.10 Validações obrigatórias
+
+| Campo | Regra |
+|---|---|
+| CPF | 11 dígitos, dígitos verificadores conferidos, rejeita sequências (`111.111.111-11`), único por academia |
+| Data de nascimento | Não pode ser futura; idade máxima **99 anos**; idade mínima conforme §7.1 |
+| WhatsApp | 10 ou 11 dígitos com DDD válido |
+| CEP | 8 dígitos; preenche endereço pelo ViaCEP |
+| UF e cidade | Da API do IBGE, não digitação livre |
+| Menor de idade | Abaixo de 18, os campos de responsável passam a ser obrigatórios |
+
 ---
 
 ## 6. Contagem
 
-| Grupo | Tabelas |
-|---|---|
-| Estrutura | `academias`, `unidades`, `unidade_user` | 3 |
-| Pessoas | `users` (alterada), `profissionais`, `alunos` | 3 |
+| Grupo | Tabelas | Qtd |
+|---|---|:--:|
+| Plano de controle (super admin) | `academias`, `unidades`, `avisos_academia` | 3 |
+| Pessoas | `users` (alterada), `unidade_user`, `profissionais`, `alunos` | 4 |
 | Contrato | `planos`, `matriculas` | 2 |
 | Financeiro | `mensalidades`, `pagamentos`, `cobrancas` | 3 |
-| Acesso | `credenciais_acesso`, `consentimentos_lgpd`, `dispositivos_acesso`, `acessos` | 4 |
+| Acesso à academia | `credenciais_acesso`, `consentimentos_lgpd`, `dispositivos_acesso`, `acessos` | 4 |
 | Notificação | `notificacoes` | 1 |
+| Segurança | `tentativas_login`, `sessions` | 2 |
 | Permissões (spatie) | 5 tabelas prontas | 5 |
 
-**≈ 21 tabelas.** Enxuto para o que o sistema faz.
+**≈ 24 tabelas.** Enxuto para o que o sistema faz.
 
 ---
 
 ## 7. Pendências — preciso da sua decisão
 
-### 7.1 CPF é obrigatório no cadastro do aluno?
+### 7.1 Qual a idade mínima para cadastrar um aluno?
 
-*Proposta:* **opcional, mas único quando preenchido.** A recepção precisa matricular alguém que esqueceu o documento em casa, e travar o cadastro por isso gera a gambiarra de digitar CPF falso. Se a cobrança online exigir CPF, ele passa a ser obrigatório só na hora de emitir a cobrança.
+A idade **máxima** já está definida em 99 anos. Falta o piso, e ele muda o formulário: abaixo de 18 os campos de responsável passam a ser obrigatórios, e abaixo de um certo ponto a academia provavelmente nem aceita matrícula.
 
-### 7.2 Primeiro mês é proporcional?
+### 7.2 Até onde o super administrador enxerga?
 
-Matriculou dia 22, escolheu vencer todo dia 10.
+O desenho atual dá a ele **apenas o plano de controle** — academias, unidades, avisos e usuários. Ele não vê aluno, mensalidade nem biometria de academia nenhuma, e as políticas de RLS não abrem exceção.
 
-- **(a) Proporcional:** cobra de 22 a 10 pelos dias corridos. Justo, mas a recepção precisa explicar um valor quebrado.
-- **(b) Mês cheio:** cobra o valor integral no primeiro vencimento. Simples, mas o aluno reclama.
-- **(c) Junto no seguinte:** o primeiro pedaço entra somado à segunda mensalidade.
+É a opção mais defensável perante a LGPD, e a que menos expõe você a um vazamento. Em contrapartida, atender um chamado de suporte fica mais difícil: sem enxergar a tela do cliente, você depende do que ele descreve.
 
-*Proposta:* **(a) proporcional**, com o cálculo visível na tela para a recepção conseguir explicar.
+### 7.3 Quando construir o design system completo?
 
-### 7.3 Quantos dias de tolerância antes da catraca bloquear?
+Hoje existem seis componentes (botão, campo, pílula, cartão, logo, alternador de tema) — o suficiente para a página inicial e o login, não para um CRUD.
 
-*Proposta:* **configurável por academia, padrão 5 dias.** Bloquear no dia seguinte ao vencimento gera briga no balcão; nunca bloquear torna a catraca inútil como instrumento de cobrança.
+Faltam: barra lateral com recolher, cabeçalho de página, tabela que vira lista no celular, paginação, modal de confirmação, aviso de topo, abas, campo com máscara, seletor de data numérico, combo de busca, upload de imagem, estado vazio, indicador de carregamento e o layout do painel.
 
-### 7.4 Qual provedor de cobrança Pix?
+### 7.4 Verificação de CPF em serviço externo
 
-Muda os campos de `cobrancas`, o formato dos webhooks e o custo por transação. As opções realistas para academia pequena no Brasil são Asaas, Mercado Pago, Efí e integração direta com o banco. **Precisa da sua escolha** — ou, se ainda não decidiu, eu modelo `cobrancas` de forma neutra e a integração fica para uma etapa própria.
+Você citou "consultar API externa e verificar outros dados, como se o nome está correto". Isso precisa de distinção:
 
-### 7.5 Plano com prazo tem multa por cancelamento?
+- **Validar o CPF matematicamente** — grátis, offline, instantâneo. Pega erro de digitação. **Já está no plano.**
+- **Confirmar se o CPF existe e a quem pertence** — exige serviço pago (Serpro, ou revendas como Infosimples e BrasilAPI paga). Custa por consulta, precisa de contrato, e a consulta em si é tratamento de dado pessoal que entra no seu inventário de LGPD.
 
-Se o plano anual for pago mensalmente e o aluno sair no quinto mês, há multa? *Proposta:* campo `multa_cancelamento` no plano, com zero como padrão — assim quem não usa não vê.
+### 7.5 Provedor de Pix — a decidir juntos
 
-### 7.6 O aluno terá acesso próprio ("Meu Pulso")?
+Ficou combinado pesquisar e decidir junto, mais adiante. Até lá, `cobrancas` fica **neutra**: `provedor`, `id_externo`, `payload` (JSONB) e situação. Qualquer um dos candidatos encaixa nesse formato sem migration.
 
-O guia de marca prevê a área do aluno. Se entrar nesta versão, `alunos` precisa de credencial de login. *Proposta:* **não nesta versão**, mas já deixar `alunos.email` único por academia para não precisar migrar depois.
+Quando for a hora, comparo Asaas, Mercado Pago, Efí e banco direto por custo do Pix, custo do cartão, prazo de repasse, qualidade do webhook, exigência de CNPJ e split para rede com filiais.
+
+### 7.6 API de WhatsApp
+
+Você informará qual usaremos. O modelo já prevê `notificacoes` com `canal`, `modelo`, `destino` e `situacao` — serve para API oficial da Meta ou para intermediador, sem mudança de tabela.
 
 ---
 
-## 8. O que acontece depois deste documento
+## 8. O que já está resolvido nas telas
+
+Máscaras, teclado numérico, caixa de título, padrão de CRUD, barra lateral e componentes estão em [`../interface/README.md`](../interface/README.md). São convenção de interface, não modelo de dados — por isso vivem em outro documento.
+
+---
+
+## 9. O que acontece depois deste documento
 
 1. Você lê, risca e corrige — principalmente a §7.
 2. Fecho as pendências e ajusto o modelo.
-3. Só então: migrations, models, RLS, testes de isolamento e seeders com dados em pt-BR.
+3. **Design system completo** (§7.3), porque as telas de CRUD dependem dele.
+4. Migrations, models, RLS, testes de isolamento e seeders com dados em pt-BR.

@@ -51,6 +51,9 @@ config/
 database/
   postgres/            Criação de bancos, papéis e privilégios (SQL)
   migrations/          Migrations do Laravel
+docs/
+  dominio/             Modelo de dados, regras de negócio e permissões
+  interface/           Máscaras, padrão de CRUD, layout e componentes
 docs/marca/            Guia de marca, tokens de design e assets
   README.md            Nome, slogans, logo, cores, temas, acessibilidade e LGPD
   tokens.css           Fonte da verdade das cores (temas claro e escuro)
@@ -148,8 +151,9 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | Etapa | Situação |
 |---|---|
 | 1. Fundação, design system, página inicial e acesso | ✅ concluída |
-| 2a. Modelo de domínio em texto — [`docs/dominio/`](docs/dominio/README.md) | 🔶 em revisão |
-| 2b. Migrations, models e Row Level Security | ⬜ depende de 2a |
+| 2a. Modelo de domínio e convenções de interface, em texto | 🔶 em revisão |
+| 2b. Design system completo (~19 componentes) | ⬜ depende de 2a |
+| 2c. Migrations, models e Row Level Security | ⬜ depende de 2a |
 | 3. Cadastros: alunos, planos, matrículas | ⬜ |
 | 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ |
 | 5. Controle de acesso: catraca e biometria | ⬜ |
