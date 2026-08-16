@@ -250,37 +250,34 @@
 }
 
 /* -------------------------------------------------------------------------
-   Alternador de tema — unica regra do projeto que consulta o tema vigente.
+   Alternador de tema.
+
+   TRES estados, TRES icones. O icone segue a ESCOLHA do usuario
+   (data-tema-escolhido), nao o tema resolvido — do contrario "sistema" e
+   "claro" mostrariam o mesmo sol, e clicar com o sistema ja no claro pareceria
+   nao ter funcionado.
 
    Nao viola a regra do guia de marca: aqui nao se declara cor nenhuma, apenas
-   qual dos dois icones fica visivel. Cor continua vindo so de token.
+   qual icone fica visivel. Cor continua vindo so de token.
    ------------------------------------------------------------------------- */
+.alternador-tema .icone-claro,
 .alternador-tema .icone-escuro {
     display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) .alternador-tema .icone-claro {
-        display: none;
-    }
-
-    :root:not([data-theme='light']) .alternador-tema .icone-escuro {
-        display: block;
-    }
-}
-
-:root[data-theme='dark'] .alternador-tema .icone-claro {
-    display: none;
-}
-
-:root[data-theme='dark'] .alternador-tema .icone-escuro {
+.alternador-tema .icone-sistema {
     display: block;
 }
 
-:root[data-theme='light'] .alternador-tema .icone-claro {
+:root[data-tema-escolhido='claro'] .alternador-tema .icone-sistema,
+:root[data-tema-escolhido='escuro'] .alternador-tema .icone-sistema {
+    display: none;
+}
+
+:root[data-tema-escolhido='claro'] .alternador-tema .icone-claro {
     display: block;
 }
 
-:root[data-theme='light'] .alternador-tema .icone-escuro {
-    display: none;
+:root[data-tema-escolhido='escuro'] .alternador-tema .icone-escuro {
+    display: block;
 }

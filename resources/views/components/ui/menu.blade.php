@@ -15,14 +15,20 @@
 --}}
 
 <div {{ $attributes->merge(['class' => 'relative']) }} x-data="{ aberto: false }" @keydown.escape.window="aberto = false">
+    {{--
+        Com gatilho próprio (menu do usuário, por exemplo) o botão perde a
+        moldura e a largura fixa: quem passou o conteúdo decide a aparência.
+    --}}
     <button
         type="button"
         @click="aberto = ! aberto"
         :aria-expanded="aberto ? 'true' : 'false'"
         aria-haspopup="menu"
-        class="inline-flex size-toque items-center justify-center rounded-md border border-borda-forte
-               bg-superficie text-texto-2 transition-colors hover:bg-superficie-2 hover:text-texto
-               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco"
+        class="inline-flex min-h-toque items-center justify-center rounded-md transition-colors
+               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco
+               {{ isset($gatilho)
+                   ? 'px-2 hover:bg-superficie-2'
+                   : 'size-toque border border-borda-forte bg-superficie text-texto-2 hover:bg-superficie-2 hover:text-texto' }}"
     >
         <span class="sr-only">{{ $rotulo }}</span>
         {{ $gatilho ?? '' }}

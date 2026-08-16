@@ -46,6 +46,59 @@ final class Nomes
      */
     private const PREFIXOS_APOSTROFO = ["d'", "o'", "l'"];
 
+    /**
+     * Nome curto para cabeçalho e listas apertadas.
+     *
+     * "Jose Maria da Silva" -> "Jose Maria"
+     * "Maria da Silva"      -> "Maria Silva"
+     * "Ana"                 -> "Ana"
+     *
+     * Pega o primeiro nome mais o próximo termo que não seja conectiva. Só o
+     * primeiro nome seria ambíguo numa academia com três Marias; o nome
+     * completo não cabe no cabeçalho.
+     */
+    public static function curto(?string $nome): string
+    {
+        $completo = self::caixaDeTitulo($nome);
+
+        if ($completo === null || $completo === '') {
+            return '';
+        }
+
+        $palavras = explode(' ', $completo);
+        $primeiro = array_shift($palavras);
+
+        foreach ($palavras as $palavra) {
+            if (! in_array(mb_strtolower($palavra, 'UTF-8'), self::CONECTIVAS, true)) {
+                return $primeiro.' '.$palavra;
+            }
+        }
+
+        return $primeiro;
+    }
+
+    /**
+     * Iniciais para o avatar: "Jose Maria da Silva" -> "JM".
+     *
+     * Usa as mesmas duas palavras do nome curto, para que o círculo e o texto
+     * ao lado contem a mesma história.
+     */
+    public static function iniciais(?string $nome): string
+    {
+        $curto = self::curto($nome);
+
+        if ($curto === '') {
+            return '?';
+        }
+
+        $letras = array_map(
+            static fn (string $palavra): string => mb_strtoupper(mb_substr($palavra, 0, 1, 'UTF-8'), 'UTF-8'),
+            explode(' ', $curto),
+        );
+
+        return implode('', $letras);
+    }
+
     public static function caixaDeTitulo(?string $nome): ?string
     {
         if ($nome === null) {

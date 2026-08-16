@@ -92,15 +92,21 @@ final class DemonstracaoSeeder extends Seeder
         $apelido = str($academia->nome)->slug()->toString();
 
         // ---------------- equipe ----------------
+        // Nomes de pessoa de verdade: "Dono da Alpha Fit" no cabeçalho vira
+        // "Dono Alpha", que não ajuda a avaliar como a tela fica em uso real.
+        [$nomeDono, $nomeRecepcao] = $academia->nome === 'Alpha Fit'
+            ? ['Vladir Alencar de Sousa', 'Patrícia Gomes Lima']
+            : ['Rita de Cássia Barroso', 'Douglas Feitosa Rocha'];
+
         $dono = User::factory()->daAcademia($academia->id)->create([
-            'name' => 'Dono da '.$academia->nome,
+            'name' => $nomeDono,
             'email' => "dono@{$apelido}.com.br",
             'password' => Hash::make('pulso1234'),
         ]);
         $dono->assignRole('dono');
 
         $recepcao = User::factory()->daAcademia($academia->id)->create([
-            'name' => 'Recepção',
+            'name' => $nomeRecepcao,
             'email' => "recepcao@{$apelido}.com.br",
             'password' => Hash::make('pulso1234'),
         ]);

@@ -2,6 +2,8 @@
     'href' => null,
     'destrutivo' => false,
     'icone' => null,
+    /* "submit" quando o item envia um formulário — o caso do Sair. */
+    'tipo' => 'button',
 ])
 
 @php
@@ -23,7 +25,7 @@
         {{ $slot }}
     </a>
 @else
-    <button type="button" role="menuitem" {{ $attributes->merge(['class' => $classes]) }}>
+    <button type="{{ $tipo }}" role="menuitem" {{ $attributes->merge(['class' => $classes]) }}>
         @if ($icone)
             <svg viewBox="0 0 20 20" class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.7"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">

@@ -72,11 +72,13 @@
                 <x-marca.logo class="h-8 w-auto" rotulo="Pulso — início" />
             </a>
 
-            {{ $unidades ?? '' }}
+            {{-- Academia (e filial, quando houver mais de uma). --}}
+            <x-painel.seletor-unidade />
 
             <div class="ml-auto flex items-center gap-1">
-                <x-ui.alternador-tema />
                 {{ $acoesCabecalho ?? '' }}
+                <x-ui.alternador-tema />
+                <x-painel.menu-usuario />
             </div>
         </header>
 

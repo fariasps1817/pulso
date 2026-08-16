@@ -1,23 +1,8 @@
 <x-layout.painel titulo="Radar" secao="radar">
-    <x-slot:unidades>
-        <div class="hidden min-w-0 items-center gap-2 sm:flex">
-            <span class="text-sm text-texto-mudo">Unidade:</span>
-            <span class="truncate font-medium text-texto">Centro</span>
-        </div>
-    </x-slot:unidades>
-
-    <x-slot:acoesCabecalho>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <x-ui.botao tipo="submit" variante="secundario">Sair</x-ui.botao>
-        </form>
-    </x-slot:acoesCabecalho>
-
     <x-slot:avisos>
-        <x-ui.aviso tipo="informativo" titulo="Etapa 2b — design system">
-            O painel de verdade entra depois das migrations. Esta tela existe para conferir o
-            layout: recolha a barra lateral, alterne o tema e reduza a janela para ver a barra
-            inferior aparecer.
+        <x-ui.aviso tipo="informativo" titulo="Radar em construção">
+            Os números abaixo ainda são ilustrativos. O Radar de verdade entra depois das telas
+            de cadastro, quando houver aluno e mensalidade para medir.
         </x-ui.aviso>
     </x-slot:avisos>
 
@@ -46,8 +31,8 @@
     </div>
 
     <x-ui.estado-vazio
-        titulo="Olá, {{ auth()->user()->name }}."
-        descricao="A autenticação e o design system estão de pé. Alunos, matrículas e mensalidades entram depois das migrations."
+        titulo="Olá, {{ \App\Support\Nomes::curto(auth()->user()->name) }}."
+        descricao="O banco, o isolamento entre academias e o design system estão de pé. As telas de cadastro entram a seguir."
         icone="M10 2.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm0 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"
     />
 </x-layout.painel>
