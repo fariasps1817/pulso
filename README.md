@@ -148,7 +148,8 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | Etapa | Situação |
 |---|---|
 | 1. Fundação, design system, página inicial e acesso | ✅ concluída |
-| 2. Multi-academia: tabelas, papéis e Row Level Security | ⬜ próxima |
+| 2a. Modelo de domínio em texto — [`docs/dominio/`](docs/dominio/README.md) | 🔶 em revisão |
+| 2b. Migrations, models e Row Level Security | ⬜ depende de 2a |
 | 3. Cadastros: alunos, planos, matrículas | ⬜ |
 | 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ |
 | 5. Controle de acesso: catraca e biometria | ⬜ |
