@@ -118,6 +118,8 @@
             @endforeach
         </x-ui.tabela>
 
+        <x-ui.paginacao :paginador="$academias" rotulo="academias" />
+
         <p class="text-sm text-texto-mudo">
             O número de alunos é mantido por cada academia. O Pulso não lê os dados delas —
             as políticas de isolamento do banco não abrem exceção nem para esta tela.

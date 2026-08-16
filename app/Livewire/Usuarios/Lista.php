@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Usuarios;
 
 use App\Models\User;
+use App\Services\Acesso\SenhaTemporaria;
 use App\Support\Academia\Papeis;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,9 +32,38 @@ final class Lista extends Component
     #[Url(as: 'busca', except: '')]
     public string $termo = '';
 
+    /** Mostrada uma vez, logo depois de redefinir. */
+    public ?string $senhaTemporaria = null;
+
+    public ?string $senhaDe = null;
+
     public function mount(): void
     {
         $this->authorize('viewAny', User::class);
+    }
+
+    /**
+     * Gera uma senha nova para quem perdeu a sua.
+     *
+     * O gestor repassa e a pessoa é obrigada a trocá-la no primeiro acesso —
+     * a mesma regra do cadastro, para o gestor nunca ficar sabendo a senha
+     * definitiva de ninguém.
+     */
+    public function redefinirSenha(int $id): void
+    {
+        $alvo = User::query()
+            ->where('academia_id', auth()->user()->academia_id)
+            ->findOrFail($id);
+
+        $this->authorize('redefinirSenha', $alvo);
+
+        $this->senhaTemporaria = SenhaTemporaria::redefinirPara($alvo, auth()->user());
+        $this->senhaDe = (string) $alvo->name;
+    }
+
+    public function fecharSenha(): void
+    {
+        $this->reset(['senhaTemporaria', 'senhaDe']);
     }
 
     public function render(): View

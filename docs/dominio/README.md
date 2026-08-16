@@ -611,6 +611,18 @@ Academia, **primeira unidade** e **primeiro dono**, na mesma transação. Criar 
 
 O dono recebe uma senha temporária, mostrada uma vez na tela para a equipe do Pulso repassar na entrega, e trocada obrigatoriamente no primeiro acesso.
 
+#### 5.6.2.1 Devolver o acesso a quem se perdeu
+
+O caso real: o dono é um só, esqueceu a senha, e o e-mail de recuperação não está configurado. Sem uma saída, a academia fica parada e a única alternativa seria mexer no banco.
+
+**É a única exceção à garantia de isolamento, e é consciente.** Em toda a área do SaaS o Pulso não alcança dado de academia nenhuma — mas quem gera a senha de um usuário pode entrar com ela. O que sustenta a troca:
+
+- a ação fica **registrada** com quem pediu;
+- a senha é temporária e a pessoa é **obrigada** a trocá-la, então o acesso da equipe do Pulso dura até o dono entrar;
+- as sessões abertas caem junto — redefinir senha também acontece quando a conta pode estar em mãos erradas.
+
+> Quando o envio de e-mail estiver configurado, a recuperação pelo próprio usuário passa a ser o caminho normal e esta tela vira último recurso.
+
 #### 5.6.3 O número de alunos, sem ler os alunos
 
 A cobrança do SaaS depende do porte da academia e de ela ter filial. Filial o super administrador conta direto — `unidades` é plano de controle. Aluno, não: as políticas de RLS não abrem para ele.
@@ -618,6 +630,20 @@ A cobrança do SaaS depende do porte da academia e de ela ter filial. Filial o s
 Então `academias.total_alunos_ativos` guarda o número, mantido pela **própria academia** (que tem contexto) a cada mudança de matrícula. O super administrador lê um número, nunca uma pessoa.
 
 O total é **recontado**, não incrementado. Contador que soma e subtrai a cada evento acumula erro — uma exceção no meio de uma transação, uma importação, um `delete` em cascata — e o desvio só aparece meses depois, numa fatura errada.
+
+### 5.7.1 Avisos do Pulso
+
+O único canal do fornecedor com o cliente dentro do sistema. Aparecem no topo de **toda** tela do painel, não numa página que ninguém abre.
+
+| Campo | Para quê |
+|---|---|
+| `academia_id` nulo | vale para todas — é como se anuncia manutenção programada |
+| `exibir_de` / `exibir_ate` | **obrigatórios**: aviso sem fim vira paisagem, e quando vier um recado que importa a academia já terá sido treinada a ignorar |
+| `dispensavel` | falso para alerta de bloqueio |
+
+**O aviso não dispensável é o ponto do recurso.** Um alerta de bloqueio iminente que some ao ser fechado deixa o dono descobrir na segunda-feira, com a academia parada. A regra vale no servidor, não só na tela: o endereço de dispensa recusa o aviso não dispensável.
+
+A dispensa fica no perfil (`users.preferencias`), e não no navegador: quem fechou no balcão não quer rever no celular.
 
 ### 5.8 Cadastro da equipe pela própria academia
 

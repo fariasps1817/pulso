@@ -10,6 +10,31 @@
         :voltar-para="['rotulo' => 'Academias', 'url' => route('administracao.academias.lista')]"
     />
 
+    @if ($senhaTemporaria)
+        {{-- Ocupa o topo da tela: sair daqui sem copiar significa gerar outra.
+             Guardá-la em algum lugar para poder mostrar de novo seria pior. --}}
+        <x-ui.cartao destaque class="flex flex-col gap-4">
+            <div>
+                <h2 class="font-titulo text-lg text-texto">Senha nova para {{ $senhaDe }}</h2>
+                <p class="mt-1 text-texto-2">
+                    Ela é temporária: no primeiro acesso o sistema exige que a própria pessoa
+                    escolha a dela. As sessões que estavam abertas foram encerradas.
+                </p>
+            </div>
+
+            <p class="numeros rounded-md border border-borda-forte bg-superficie-2 px-4 py-3
+                      text-center font-titulo text-2xl tracking-wider text-texto select-all">
+                {{ $senhaTemporaria }}
+            </p>
+
+            <p class="text-sm text-texto-mudo">Esta senha não será mostrada de novo.</p>
+
+            <div>
+                <x-ui.botao wire:click="fecharSenha" variante="secundario">Já anotei</x-ui.botao>
+            </div>
+        </x-ui.cartao>
+    @endif
+
     @if (! $academia->situacao->permiteAcessoAoSistema())
         <x-ui.aviso tipo="atencao" titulo="Esta academia está sem acesso ao sistema">
             A equipe dela não consegue entrar desde
@@ -54,7 +79,27 @@
         <x-ui.cartao class="flex flex-col gap-5">
             <h2 class="font-titulo text-lg text-texto">Situação no Pulso</h2>
 
-            <form wire:submit="alterarSituacao" class="flex flex-col gap-4">
+            @php
+                $escolhida = App\Enums\SituacaoAcademia::from($situacao);
+
+                /*
+                 * Suspender e cancelar tiram a academia do ar. A confirmação
+                 * diz O QUE ACONTECE, e não "tem certeza?" — é a diferença
+                 * entre alguém ler e alguém clicar em OK por reflexo.
+                 */
+                $confirmacao = match ($escolhida) {
+                    App\Enums\SituacaoAcademia::Bloqueada =>
+                        "Bloquear {$academia->nome}? A equipe dela perde o acesso ao sistema imediatamente. "
+                        .'A catraca continua liberando os alunos em dia.',
+                    App\Enums\SituacaoAcademia::Cancelada =>
+                        "Cancelar {$academia->nome}? A equipe perde o acesso E a catraca para de liberar os alunos. "
+                        .'Os dados são preservados, mas a academia fica parada.',
+                    default => null,
+                };
+            @endphp
+
+            <form wire:submit="alterarSituacao" class="flex flex-col gap-4"
+                  @if ($confirmacao) wire:confirm="{{ $confirmacao }}" @endif>
                 <x-ui.selecao
                     largura="100"
                     nome="situacao"
@@ -127,6 +172,13 @@
                             @unless ($pessoa->ativo)
                                 <span class="block text-texto-mudo">inativo</span>
                             @endunless
+
+                            <button type="button" wire:click="redefinirSenhaDe({{ $pessoa->id }})"
+                                    wire:confirm="Gerar uma senha nova para {{ $pessoa->name }}? Use quando a pessoa perdeu o acesso e não consegue recuperá-lo sozinha. A ação fica registrada."
+                                    class="mt-1 block w-full rounded-sm text-right text-acao hover:underline
+                                           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco">
+                                Nova senha
+                            </button>
                         </span>
                     </div>
                 @endforeach
@@ -134,6 +186,12 @@
 
             {{-- Dito na tela, e não só na documentação: quem usa precisa saber
                  por que não há um botão para "ver os alunos". --}}
+            <p class="text-sm text-texto-mudo">
+                Gerar uma senha é a única forma de o Pulso alcançar o interior de uma academia —
+                e por isso fica registrado quem pediu. Use quando a pessoa perdeu o acesso e não
+                consegue recuperá-lo sozinha.
+            </p>
+
             <p class="text-sm text-texto-mudo">
                 Aluno, mensalidade e biometria desta academia não são acessíveis por aqui.
                 O isolamento do banco não abre exceção para a equipe do Pulso — nem por esta tela,

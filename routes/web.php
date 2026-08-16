@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AvisoController;
 use App\Http\Controllers\PreferenciaController;
 use App\Http\Controllers\UnidadeAtualController;
 use App\Livewire\Acesso;
@@ -62,6 +63,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     Route::post('/preferencias', [PreferenciaController::class, 'salvar'])->name('preferencias.salvar');
     Route::post('/unidade-atual', [UnidadeAtualController::class, 'trocar'])->name('painel.trocar-unidade');
+    Route::post('/avisos/{aviso}/dispensar', [AvisoController::class, 'dispensar'])->name('avisos.dispensar');
 
     /*
      * Alunos.
@@ -150,6 +152,8 @@ Route::middleware(['auth'])->prefix('administracao')->name('administracao.')->gr
         Route::get('/nova', Administracao\NovaAcademia::class)->name('nova');
         Route::get('/{academia}', Administracao\DetalhesDaAcademia::class)->name('detalhes');
     });
+
+    Route::get('/avisos', Administracao\Avisos::class)->name('avisos');
 });
 
 /*

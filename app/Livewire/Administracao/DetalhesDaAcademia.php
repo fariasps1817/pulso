@@ -8,6 +8,7 @@ use App\Enums\SituacaoAcademia;
 use App\Models\Academia;
 use App\Models\User;
 use App\Rules\DataBrasileira;
+use App\Services\Acesso\SenhaTemporaria;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -34,6 +35,11 @@ final class DetalhesDaAcademia extends Component
     public string $motivo_bloqueio = '';
 
     public ?string $assinatura_vence_em = null;
+
+    /** Mostrada uma vez, logo depois de redefinir. */
+    public ?string $senhaTemporaria = null;
+
+    public ?string $senhaDe = null;
 
     public function mount(Academia $academia): void
     {
@@ -88,6 +94,40 @@ final class DetalhesDaAcademia extends Component
             'tipo' => $exigeMotivo ? 'atencao' : 'sucesso',
             'texto' => "Situação alterada para {$nova->rotulo()}.",
         ]);
+    }
+
+    /**
+     * Devolve o acesso a quem ficou de fora.
+     *
+     * O CASO REAL: o dono é um só, esqueceu a senha, e o e-mail de
+     * recuperação ainda não está configurado. Sem isto, a academia fica
+     * parada e a única saída seria mexer no banco.
+     *
+     * ISTO É UMA EXCEÇÃO CONSCIENTE À GARANTIA DE ISOLAMENTO. Em toda esta
+     * área o Pulso não alcança dado de academia nenhuma — mas quem gera a
+     * senha de um usuário pode entrar com ela. A troca é deliberada:
+     *
+     *   - a ação fica REGISTRADA com quem pediu (ver SenhaTemporaria);
+     *   - a senha é temporária e a pessoa é obrigada a trocá-la, então o
+     *     acesso da equipe do Pulso dura até o dono entrar;
+     *   - as sessões abertas caem junto.
+     *
+     * Quando o envio de e-mail estiver configurado, a recuperação pelo próprio
+     * usuário passa a ser o caminho normal, e esta tela vira último recurso.
+     */
+    public function redefinirSenhaDe(int $id): void
+    {
+        $alvo = User::query()
+            ->where('academia_id', $this->academia->id)
+            ->findOrFail($id);
+
+        $this->senhaTemporaria = SenhaTemporaria::redefinirPara($alvo, auth()->user());
+        $this->senhaDe = (string) $alvo->name;
+    }
+
+    public function fecharSenha(): void
+    {
+        $this->reset(['senhaTemporaria', 'senhaDe']);
     }
 
     /**

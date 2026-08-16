@@ -182,6 +182,8 @@ A mensagem de bloqueio é **idêntica** para conta existente e inexistente, e a 
 | Painel da academia | quem tem `academia_id` | `/painel` |
 | Administração do SaaS | quem tem `academia_id` **nulo** | `/administracao` |
 
+O Pulso fala com o cliente por **avisos** (`/administracao/avisos`), que aparecem no topo de toda tela da academia. O aviso pode ser marcado como **não dispensável** — é o caso do alerta de bloqueio, que não pode sumir com um clique e deixar o dono descobrir na segunda-feira.
+
 O super administrador é a equipe do Pulso. Ele **não pertence a academia nenhuma**, e é isso — não um papel atribuído por tela — que define quem ele é. Como as políticas de Row Level Security comparam `academia_id` com o contexto da requisição, e o dele é vazio, **nenhuma linha de aluno, mensalidade ou biometria aparece para ele**. Não há exceção no banco.
 
 O que ele alcança é o plano de controle: `academias`, `unidades`, `avisos_academia` e `users` — esta última porque a autenticação precisa acontecer antes de existir "academia atual".
@@ -245,5 +247,6 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 7a. Área do super administrador — academias, bloqueio e cobrança | ✅ concluída |
 | 7b. Cadastro da equipe pela própria academia | ✅ concluída |
 | 7c. Configurações da academia e segurança do acesso | ✅ concluída |
+| 7d. Avisos do Pulso, redefinição de senha e confirmações | ✅ concluída |
 | 8. Notificações por WhatsApp | ⬜ próxima |
 | 9. Deploy na VPS | ⬜ |

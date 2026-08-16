@@ -8,11 +8,11 @@ use App\Enums\SituacaoAcademia;
 use App\Models\Academia;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 /**
  * As academias que usam o Pulso.
@@ -32,29 +32,58 @@ use Livewire\Component;
 #[Title('Academias')]
 final class Academias extends Component
 {
+    use WithPagination;
+
     #[Url(as: 'busca', except: '')]
     public string $termo = '';
 
     #[Url(as: 'situacao', except: 'todas')]
     public string $filtro = 'todas';
 
+    public function updatedTermo(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFiltro(): void
+    {
+        $this->resetPage();
+    }
+
     public function render(): View
     {
-        $academias = $this->consultar();
-
         return view('livewire.administracao.academias', [
-            'academias' => $academias,
+            'academias' => $this->consultar()->paginate(25),
             'situacoes' => SituacaoAcademia::cases(),
-            'totais' => [
-                'academias' => $academias->count(),
-                'alunos' => $academias->sum('total_alunos_ativos'),
-                'com_filial' => $academias->filter(fn (Academia $a): bool => $a->unidades_count > 1)->count(),
-            ],
+            /*
+             * Os totais saem de uma consulta AGREGADA, não da página.
+             * Somar o que está na tela daria "3 academias" na segunda página
+             * de uma base com duzentas — e é justamente o número que decide
+             * se a operação está crescendo.
+             */
+            'totais' => $this->totais(),
         ]);
     }
 
-    /** @return Collection<int, Academia> */
-    private function consultar()
+    /** @return array{academias: int, alunos: int, com_filial: int} */
+    private function totais(): array
+    {
+        $base = Academia::query()->when(
+            $this->filtro !== 'todas',
+            fn (Builder $q) => $q->where('situacao', $this->filtro),
+        );
+
+        return [
+            'academias' => $base->clone()->count(),
+            'alunos' => (int) $base->clone()->sum('total_alunos_ativos'),
+            'com_filial' => $base->clone()
+                ->whereHas('unidades', fn (Builder $q) => $q->where('ativa', true), '>', 1)
+                ->count(),
+        ];
+    }
+
+    /** @return Builder<Academia> */
+    private function consultar(): Builder
     {
         return Academia::query()
             // `unidades` e `users` são plano de controle: ficam fora do
@@ -69,7 +98,6 @@ final class Academias extends Component
                     ->orWhere('cnpj', 'ilike', '%'.preg_replace('/\D/', '', $this->termo).'%'),
             ))
             ->when($this->filtro !== 'todas', fn (Builder $q) => $q->where('situacao', $this->filtro))
-            ->orderBy('nome')
-            ->get();
+            ->orderBy('nome');
     }
 }

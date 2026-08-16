@@ -9,6 +9,7 @@ use App\Models\Academia;
 use App\Models\Unidade;
 use App\Models\User;
 use App\Rules\DataBrasileira;
+use App\Services\Acesso\SenhaTemporaria;
 use App\Support\Academia\ContextoAcademia;
 use App\Support\Academia\PadroesDeAcesso;
 use App\Support\Documentos;
@@ -109,7 +110,7 @@ final class NovaAcademia extends Component
 
         Validator::make($dados, $this->rules(), $this->messages())->validate();
 
-        $senha = $this->gerarSenha();
+        $senha = SenhaTemporaria::gerar();
 
         $academia = DB::transaction(function () use ($dados, $senha, $contexto): Academia {
             $academia = Academia::create([
@@ -188,16 +189,6 @@ final class NovaAcademia extends Component
                 ? DataBrasileira::converter($this->assinatura_vence_em)?->toDateString()
                 : null,
         ];
-    }
-
-    /** Sem caracteres que se confundem ao telefone — a equipe vai ditar isto. */
-    private function gerarSenha(): string
-    {
-        $alfabeto = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
-        return collect(range(1, 12))
-            ->map(fn (): string => $alfabeto[random_int(0, strlen($alfabeto) - 1)])
-            ->implode('');
     }
 
     public function render(): View

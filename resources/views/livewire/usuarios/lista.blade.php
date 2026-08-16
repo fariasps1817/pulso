@@ -13,6 +13,31 @@
         @endcan
     </x-ui.cabecalho-pagina>
 
+    @if ($senhaTemporaria)
+        {{-- Ocupa o topo da tela: sair daqui sem copiar significa gerar outra.
+             Guardá-la em algum lugar para poder mostrar de novo seria pior. --}}
+        <x-ui.cartao destaque class="flex flex-col gap-4">
+            <div>
+                <h2 class="font-titulo text-lg text-texto">Senha nova para {{ $senhaDe }}</h2>
+                <p class="mt-1 text-texto-2">
+                    Ela é temporária: no primeiro acesso o sistema exige que a própria pessoa
+                    escolha a dela. As sessões que estavam abertas foram encerradas.
+                </p>
+            </div>
+
+            <p class="numeros rounded-md border border-borda-forte bg-superficie-2 px-4 py-3
+                      text-center font-titulo text-2xl tracking-wider text-texto select-all">
+                {{ $senhaTemporaria }}
+            </p>
+
+            <p class="text-sm text-texto-mudo">Esta senha não será mostrada de novo.</p>
+
+            <div>
+                <x-ui.botao wire:click="fecharSenha" variante="secundario">Já anotei</x-ui.botao>
+            </div>
+        </x-ui.cartao>
+    @endif
+
     <div class="relative">
         <svg viewBox="0 0 20 20" class="pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-texto-mudo"
              fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
@@ -72,6 +97,15 @@
                     </td>
 
                     <td data-rotulo="Situação" class="px-4 py-3 text-right">
+                        @can('redefinirSenha', $pessoa)
+                            <button type="button" wire:click="redefinirSenha({{ $pessoa->id }})"
+                                    wire:confirm="Gerar uma senha nova para {{ $pessoa->name }}? A senha atual deixa de valer na hora e as sessões abertas caem."
+                                    class="mr-3 rounded-sm text-sm text-acao hover:underline
+                                           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco">
+                                Nova senha
+                            </button>
+                        @endcan
+
                         @if (! $pessoa->ativo)
                             <x-ui.pilula estado="vencido">Inativo</x-ui.pilula>
                         @elseif ($pessoa->deve_trocar_senha)

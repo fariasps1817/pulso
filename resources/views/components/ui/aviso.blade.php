@@ -3,6 +3,12 @@
     'tipo' => 'informativo',
     'titulo' => null,
     'dispensavel' => false,
+    /*
+     * Endereco que registra a dispensa no perfil de quem fechou. Sem ele, o
+     * aviso volta no proximo carregamento — e o do Pulso precisa ficar
+     * fechado tambem no celular de quem o fechou no balcao.
+     */
+    'dispensarEm' => null,
 ])
 
 {{--
@@ -46,7 +52,27 @@
 
 <div
     role="{{ $atual['papel'] }}"
-    @if ($dispensavel) x-data="{ visivel: true }" x-show="visivel" @endif
+    @if ($dispensavel)
+        x-data="{
+            visivel: true,
+            fechar() {
+                this.visivel = false;
+
+                @if ($dispensarEm)
+                    // A dispensa é gravada, mas a faixa some na hora: esperar a
+                    // resposta faria o clique parecer sem efeito.
+                    fetch('{{ $dispensarEm }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                        },
+                    }).catch(() => {});
+                @endif
+            },
+        }"
+        x-show="visivel"
+    @endif
     {{ $attributes->merge(['class' => 'flex items-start gap-3 rounded-md border p-4 '.$atual['classes']]) }}
 >
     <svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 {{ $atual['iconeCor'] }}" fill="none" stroke="currentColor"
@@ -63,7 +89,7 @@
     </div>
 
     @if ($dispensavel)
-        <button type="button" @click="visivel = false"
+        <button type="button" @click="fechar"
                 class="-m-1 shrink-0 rounded-md p-1 transition-opacity hover:opacity-70
                        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco"
                 aria-label="Dispensar aviso">

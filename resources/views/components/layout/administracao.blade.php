@@ -19,6 +19,7 @@
 @php
     $itens = [
         ['id' => 'academias', 'rotulo' => 'Academias', 'url' => route('administracao.academias.lista')],
+        ['id' => 'avisos', 'rotulo' => 'Avisos', 'url' => route('administracao.avisos')],
     ];
 @endphp
 

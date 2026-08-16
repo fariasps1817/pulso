@@ -150,6 +150,10 @@
             {{-- ============ Conteúdo ============ --}}
             <main id="conteudo" class="min-w-0 flex-1 pb-24 lg:pb-0">
                 <div class="mx-auto flex max-w-6xl flex-col gap-6 p-4 sm:p-6">
+                    {{-- Recados do Pulso: no topo de toda tela, porque é o
+                         único canal do fornecedor com o cliente aqui dentro. --}}
+                    <x-painel.avisos-do-pulso />
+
                     {{ $avisos ?? '' }}
                     {{ $slot }}
                 </div>

@@ -6,6 +6,7 @@ namespace App\Livewire\Usuarios;
 
 use App\Models\Unidade;
 use App\Models\User;
+use App\Services\Acesso\SenhaTemporaria;
 use App\Support\Academia\PadroesDeAcesso;
 use App\Support\Academia\Papeis;
 use Illuminate\Contracts\View\View;
@@ -168,7 +169,7 @@ final class Formulario extends Component
      */
     private function criar(array $dados, array $vinculos): void
     {
-        $senha = $this->gerarSenha();
+        $senha = SenhaTemporaria::gerar();
 
         $usuario = DB::transaction(function () use ($dados, $vinculos, $senha): User {
             $usuario = User::create([
@@ -239,21 +240,6 @@ final class Formulario extends Component
             'sessao_unica' => $this->sessao_unica,
             'ativo' => $this->ativo,
         ];
-    }
-
-    /**
-     * Senha temporária legível ao telefone.
-     *
-     * Sem caracteres que se confundem em voz ou na tela — o gestor vai ditar
-     * isto para alguém, e "1" contra "l" vira chamado de suporte.
-     */
-    private function gerarSenha(): string
-    {
-        $alfabeto = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
-        return collect(range(1, 12))
-            ->map(fn (): string => $alfabeto[random_int(0, strlen($alfabeto) - 1)])
-            ->implode('');
     }
 
     /** @return Collection<int, Unidade> */
