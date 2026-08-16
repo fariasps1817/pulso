@@ -139,6 +139,20 @@ Acesso de demonstração: `dono@alpha-fit.com.br` / `pulso1234`.
 
 > **No Laragon**, o `pg_hba.conf` vem com método `trust` — qualquer conexão local é aceita sem senha. É aceitável numa máquina de desenvolvimento. **Na VPS, use `scram-sha-256`** e senha forte, e não exponha a porta 5432 para fora.
 
+## Rotinas agendadas
+
+Na VPS, um cron chama o agendador do Laravel a cada minuto:
+
+```cron
+* * * * * cd /caminho/do/pulso && php artisan schedule:run >> /dev/null 2>&1
+```
+
+| Rotina | Quando | O que faz |
+|---|---|---|
+| `pulso:gerar-mensalidades` | 03:10, diário | Gera as mensalidades do mês para as matrículas ativas |
+
+A geração é **idempotente**: o índice único `(matricula_id, competencia)` impede duplicata, então rodar de novo é seguro. Roda pela conexão da aplicação — percorre as academias definindo o contexto de cada uma, e o RLS a autoriza uma a uma, sem precisar de um papel que atravessa o isolamento.
+
 ## Qualidade
 
 ```bash
@@ -176,7 +190,8 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 3a. CRUD de alunos (Livewire) — lista, ficha e formulário | ✅ concluída |
 | 3b. CRUD de planos | ✅ concluída |
 | 3c. Matrículas — criação, experiência, conversão, trancamento e encerramento | ✅ concluída |
-| 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ próxima |
+| 4a. Mensalidades: geração automática, recebimento e estorno | ✅ concluída |
+| 4b. Cobrança online (Pix) — provedor a definir | ⬜ |
 | 5. Controle de acesso: catraca e biometria | ⬜ |
 | 6. Radar | ⬜ |
 | 7. Notificações por WhatsApp | ⬜ |

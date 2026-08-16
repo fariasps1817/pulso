@@ -2,9 +2,34 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+/*
+|--------------------------------------------------------------------------
+| Rotinas agendadas
+|--------------------------------------------------------------------------
+|
+| Na VPS, um único cron chama o agendador a cada minuto:
+|
+|     * * * * * cd /caminho/do/pulso && php artisan schedule:run >> /dev/null 2>&1
+|
+*/
+
+/*
+ * Geração das mensalidades do mês.
+ *
+ * Roda de madrugada, quando ninguém está no balcão. É idempotente — o índice
+ * único (matricula_id, competencia) impede duplicata —, então rodar todo dia
+ * é seguro e cobre a matrícula criada ontem.
+ *
+ * `withoutOverlapping` evita duas execuções simultâneas numa academia grande,
+ * em que a geração leve mais de um minuto.
+ *
+ * Roda pela conexão da aplicação: o comando define o contexto de cada academia
+ * e o Row Level Security o autoriza uma a uma, sem precisar de um papel que
+ * atravessa o isolamento.
+ */
+Schedule::command('pulso:gerar-mensalidades')
+    ->dailyAt('03:10')
+    ->withoutOverlapping()
+    ->onOneServer();

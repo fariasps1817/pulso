@@ -6,6 +6,7 @@ use App\Http\Controllers\PreferenciaController;
 use App\Http\Controllers\UnidadeAtualController;
 use App\Livewire\Alunos;
 use App\Livewire\Matriculas;
+use App\Livewire\Mensalidades;
 use App\Livewire\Planos;
 use Illuminate\Support\Facades\Route;
 
@@ -73,6 +74,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('/', Matriculas\Lista::class)->name('lista');
         Route::get('/nova', Matriculas\Formulario::class)->name('nova');
         Route::get('/{matricula}', Matriculas\Detalhes::class)->name('detalhes');
+    });
+
+    Route::prefix('mensalidades')->name('mensalidades.')->group(function (): void {
+        Route::get('/', Mensalidades\Lista::class)->name('lista');
+        Route::get('/{mensalidade}', Mensalidades\Detalhes::class)->name('detalhes');
     });
 
     Route::prefix('planos')->name('planos.')->group(function (): void {
