@@ -1,0 +1,33 @@
+# =============================================================
+# Rede de proteção — NÃO é a configuração normal do servidor.
+# -------------------------------------------------------------
+# O DocumentRoot do Apache/Nginx tem que apontar para "public/".
+# Este arquivo só entra em ação quando alguém aponta o servidor
+# para a RAIZ do projeto por engano — situação em que ".env",
+# "vendor/", "storage/" e ".git/" ficariam acessíveis pela web.
+#
+# É defesa em profundidade, não substituto de configurar direito.
+# =============================================================
+
+# Nunca listar o conteúdo dos diretórios.
+Options -Indexes
+
+# Bloqueia arquivos ocultos: .env, .git, .htpasswd, .npmrc...
+# O RedirectMatch responde 404 em vez de 403 para não confirmar
+# a quem sonda que o arquivo existe.
+RedirectMatch 404 /\.(?!well-known)
+
+# Bloqueia arquivos de configuração e dependências na raiz.
+<FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|phpstan\.neon|pint\.json|artisan|.*\.md)$">
+    Require all denied
+</FilesMatch>
+
+# Redireciona quem chegou na raiz para o ponto de entrada correto,
+# de modo que a aplicação ainda funcione enquanto o DocumentRoot
+# não for corrigido.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

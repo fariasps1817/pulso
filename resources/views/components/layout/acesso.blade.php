@@ -11,25 +11,19 @@
 
 <x-layout.base :titulo="$titulo" class="min-h-dvh bg-fundo text-texto antialiased">
     <div class="flex min-h-dvh flex-col">
-        <div class="flex items-center justify-between px-5 py-4">
-            <a href="{{ route('site.inicio') }}"
-               class="inline-flex items-center gap-2 rounded-md px-2 py-1 text-sm text-texto-2
-                      transition-colors hover:bg-superficie-2 hover:text-texto
-                      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco">
-                <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                    <path d="M11.5 4.5 6 10l5.5 5.5" />
-                </svg>
-                Voltar ao site
-            </a>
-
+        <div class="flex items-center justify-end px-5 py-4">
             <x-ui.alternador-tema />
         </div>
 
         <main class="flex flex-1 items-center justify-center px-5 pb-16">
             <div class="w-full max-w-md">
                 <div class="flex flex-col items-center text-center">
-                    <x-marca.logo class="h-12 w-auto" />
+                    {{-- O logo e a saida para o site: quem chegou aqui por engano volta por ele. --}}
+                    <a href="{{ route('site.inicio') }}"
+                       class="inline-flex rounded-md p-1 transition-opacity hover:opacity-80
+                              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco">
+                        <x-marca.logo class="h-12 w-auto" rotulo="Pulso — ir para o site" />
+                    </a>
 
                     @if ($chamada)
                         <h1 class="mt-7 text-2xl text-texto">{{ $chamada }}</h1>

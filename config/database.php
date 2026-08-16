@@ -124,6 +124,28 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        /*
+         * Manutencao do banco de testes. Existe porque os testes rodam como
+         * "pulso_app" (para exercitar o Row Level Security de verdade), e esse
+         * papel nao pode criar tabela — as migrations do banco de teste
+         * precisam de outra conexao.
+         *
+         *     php artisan migrate:fresh --database=pgsql_teste_admin --force
+         */
+        'pgsql_teste_admin' => [
+            'driver' => 'pgsql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => env('DB_TEST_DATABASE', 'pulso_teste'),
+            'username' => env('DB_ADMIN_USERNAME', 'postgres'),
+            'password' => env('DB_ADMIN_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

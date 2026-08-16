@@ -64,13 +64,11 @@ Duas sílabas, escrita sem ambiguidade, sem acento, sem dígrafo. Ao telefone n�
 
 *Contraponto honesto:* "Pulso" não carrega o Nordeste no nome. A escolha aqui foi deixar a regionalidade na **paleta** (mar e sol) e no **tom de voz**, e manter o nome nacionalmente expansível. Se a preferência for cravar a origem no próprio nome, **Mandacaru** é a segunda opção — mais memorável e mais fácil de registrar, ao custo de quatro sílabas e de um teto simbólico fora do Nordeste.
 
-### 2.5 Verificações que faltam — fazer antes de fechar
+### 2.5 Registro de marca — adiado por decisão
 
-Não foi possível consultar registro.br nem a base do INPI deste ambiente (bloqueio de rede), e a busca na web não encontrou sistema de gestão fitness brasileiro chamado Pulso. Isso **não** substitui a busca formal. Antes de investir em identidade:
+O registro no INPI **não é pendência deste projeto**. Ficou decidido em agosto/2026 revisitar o assunto no longo prazo; o desenvolvimento segue com o nome Pulso independentemente disso.
 
-1. **INPI** — busca de anterioridade nas classes **9** (software) e **42** (SaaS/serviços de TI). A classe 42 é das mais disputadas; considerar também a **41** (serviços de treinamento físico) se houver plano de marca voltada ao aluno.
-2. **Domínios** — `pulso.com.br` provavelmente está tomado (palavra comum). Alternativas realistas: `usepulso.com.br`, `pulsoacademias.com.br`, `pulso.app`, `sistemapulso.com.br`. Registre a variante escolhida e as defensivas antes de anunciar.
-3. **Redes** — mesmo handle em Instagram e WhatsApp Business.
+Fica registrado, para quando o tema voltar: a busca de anterioridade caberia nas classes **9** (software) e **42** (SaaS/serviços de TI), com a **41** (serviços de treinamento físico) entrando se houver marca voltada ao aluno. `pulso.com.br` provavelmente está tomado, por ser palavra comum — as alternativas cogitadas foram `usepulso.com.br`, `pulsoacademias.com.br`, `pulso.app` e `sistemapulso.com.br`.
 
 ---
 
@@ -321,11 +319,12 @@ Na interface, escreva isso em português claro na tela de cadastro — a transpa
 
 ## 14. Próximos passos
 
-1. Busca de anterioridade no INPI (classes 9 e 42) e registro dos domínios — **antes** de qualquer aplicação da marca.
-2. Vetorizar o logotipo em arquivo editável (`.ai`/`.svg` com traçados expandidos) e fechar o manual de aplicação.
-3. Prototipar as duas telas que definem o produto — **Radar** e **ficha do aluno** — nos dois temas, e testar com uma recepcionista de verdade, no celular dela.
-4. Definir a arquitetura de integração de acesso: equipamentos com API/SDK documentados (Control iD iDFace, Topdata, Henry, Intelbras) e o modelo de sincronização de templates biométricos.
-5. Cadastrar os modelos de mensagem do WhatsApp para aprovação — o prazo de aprovação entra no cronograma de lançamento.
+1. Vetorizar o logotipo em arquivo editável (`.ai`/`.svg` com traçados expandidos) e fechar o manual de aplicação.
+2. Prototipar as duas telas que definem o produto — **Radar** e **ficha do aluno** — nos dois temas, e testar com uma recepcionista de verdade, no celular dela.
+3. Definir a arquitetura de integração de acesso: equipamentos com API/SDK documentados (Control iD iDFace, Topdata, Henry, Intelbras) e o modelo de sincronização de templates biométricos.
+4. Cadastrar os modelos de mensagem do WhatsApp para aprovação — o prazo de aprovação entra no cronograma de lançamento.
+
+O registro de marca no INPI **não entra nesta lista** — ver §2.5.
 
 ---
 

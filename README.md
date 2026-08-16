@@ -48,6 +48,9 @@ app/
   Support/             Formatação pt-BR (dinheiro, telefone)
 config/
   pulso.php            Nome, slogans e contatos — fonte única
+database/
+  postgres/            Criação de bancos, papéis e privilégios (SQL)
+  migrations/          Migrations do Laravel
 docs/marca/            Guia de marca, tokens de design e assets
   README.md            Nome, slogans, logo, cores, temas, acessibilidade e LGPD
   tokens.css           Fonte da verdade das cores (temas claro e escuro)
@@ -79,23 +82,40 @@ npm install
 cp .env.example .env      # no Windows: copy .env.example .env
 php artisan key:generate
 npm run build
-php artisan serve
 ```
 
-O site institucional e a tela de login sobem **sem banco de dados** — sessão e cache usam arquivo no ambiente local.
+### Endereço no ambiente local
+
+O Laragon cria o host automaticamente a partir do nome da pasta:
+
+**<http://pulso.test>**
+
+Não é `http://localhost/pulso/public/`. O `DocumentRoot` do vhost **precisa** apontar para `C:/laragon/www/pulso/public` — o Laragon define isso na criação do host e não recorrige depois, então confira em `C:\laragon\etc\apache2\sites-enabled\auto.pulso.test.conf`. Apontar para a raiz do projeto expõe `.env`, `.git/`, `vendor/` e `storage/` pela web.
+
+O [`.htaccess`](.htaccess) da raiz é uma rede de proteção contra esse erro: bloqueia arquivos ocultos, desliga a listagem de diretório e redireciona para `public/`. Ele **não** substitui configurar o vhost direito.
+
+Sem Laragon, `php artisan serve` também funciona.
 
 ### Banco de dados
 
-```bash
-# como superusuário do Postgres
-createdb -U postgres pulso
-createdb -U postgres pulso_teste
+Dois papéis, por causa do Row Level Security (ver acima):
 
-# usuário da aplicação: sem BYPASSRLS, sem ser dono das tabelas
-psql -U postgres -d pulso -c "CREATE ROLE pulso_app LOGIN PASSWORD 'troque-esta-senha';"
+```bash
+psql -U postgres -f database/postgres/01-bancos-e-papeis.sql
+psql -U postgres -d pulso       -f database/postgres/02-privilegios.sql
+psql -U postgres -d pulso_teste -f database/postgres/02-privilegios.sql
 ```
 
-Depois preencha `DB_PASSWORD` e `DB_ADMIN_PASSWORD` no `.env` e rode `php artisan migrate`.
+Depois preencha `DB_PASSWORD` e `DB_ADMIN_PASSWORD` no `.env` e rode:
+
+```bash
+composer db:migrar      # migra o banco pulso, pela conexão de manutenção
+composer db:teste       # recria o banco pulso_teste do zero
+```
+
+Migrations **não** rodam pela conexão padrão: `pulso_app` não tem permissão de criar tabela, e é exatamente isso que faz o RLS valer.
+
+> **No Laragon**, o `pg_hba.conf` vem com método `trust` — qualquer conexão local é aceita sem senha. É aceitável numa máquina de desenvolvimento. **Na VPS, use `scram-sha-256`** e senha forte, e não exponha a porta 5432 para fora.
 
 ## Qualidade
 
