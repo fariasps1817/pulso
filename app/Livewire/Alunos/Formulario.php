@@ -45,8 +45,12 @@ final class Formulario extends Component
 
     public string $whatsapp = '';
 
-    public string $telefone = '';
-
+    /*
+     * `telefone` NÃO tem propriedade aqui de propósito. O campo saiu do
+     * formulário, e a coluna continua no banco para importação e uso futuro.
+     * Se ele ficasse na normalização sem estar na tela, toda edição gravaria
+     * nulo por cima do que já existia — em silêncio.
+     */
     public string $email = '';
 
     // Endereço
@@ -126,7 +130,6 @@ final class Formulario extends Component
             'data_nascimento' => $texto($this->data_nascimento),
             'sexo' => $texto($this->sexo),
             'whatsapp' => $digitos($this->whatsapp),
-            'telefone' => $digitos($this->telefone),
             'email' => $texto($this->email),
 
             'cep' => $digitos($this->cep),
@@ -176,7 +179,6 @@ final class Formulario extends Component
 
             // Dígitos, não caracteres: 10 para fixo, 11 para celular.
             'whatsapp' => ['required', 'digits_between:10,11'],
-            'telefone' => ['nullable', 'digits_between:10,11'],
 
             'email' => [
                 'nullable', 'email', 'max:255',
@@ -216,7 +218,6 @@ final class Formulario extends Component
             'cpf.digits' => 'O CPF precisa ter 11 dígitos.',
             'whatsapp.required' => 'O WhatsApp é obrigatório: é por ele que a cobrança e os avisos saem.',
             'whatsapp.digits_between' => 'Informe o WhatsApp com DDD.',
-            'telefone.digits_between' => 'Informe o telefone com DDD.',
             'cep.digits' => 'O CEP precisa ter 8 dígitos.',
             'email.unique' => 'Já existe um aluno com esse e-mail nesta academia.',
         ];
@@ -386,7 +387,6 @@ final class Formulario extends Component
         $this->data_nascimento = $aluno->data_nascimento->format('d/m/Y');
         $this->sexo = (string) $aluno->sexo;
         $this->whatsapp = Formato::telefone((string) $aluno->whatsapp);
-        $this->telefone = $aluno->telefone ? Formato::telefone($aluno->telefone) : '';
         $this->email = (string) $aluno->email;
 
         $this->cep = $aluno->cep ? substr((string) $aluno->cep, 0, 5).'-'.substr((string) $aluno->cep, 5) : '';

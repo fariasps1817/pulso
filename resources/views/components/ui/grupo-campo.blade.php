@@ -2,8 +2,8 @@
     'nome',
     'rotulo',
     'ajuda' => null,
-    /* Obrigatorio e o padrao: numa ficha de aluno quase tudo e. Marcar
-       asterisco em tudo vira ruido; marcamos o que e opcional. */
+    /* Campo obrigatorio recebe asterisco vermelho ao lado do rotulo. O
+       opcional nao recebe marca nenhuma. */
     'obrigatorio' => true,
     'campoId' => null,
     /* Alguns controles (caixa de selecao, interruptor) trazem o proprio
@@ -34,9 +34,18 @@
     @unless ($semRotulo)
         <label for="{{ $id }}" class="text-sm font-medium text-texto-2">
             {{ $rotulo }}
-            @unless ($obrigatorio)
-                <span class="font-normal text-texto-mudo">(opcional)</span>
-            @endunless
+            @if ($obrigatorio)
+                {{--
+                    O asterisco é decorativo para quem enxerga: o atributo
+                    `required` no campo é o que o leitor de tela anuncia, e o
+                    texto oculto abaixo cobre quem não distingue a cor.
+
+                    Cor nunca carrega informação sozinha (guia de marca): aqui
+                    são símbolo + atributo + texto para leitor de tela.
+                --}}
+                <span class="text-vencido-forte" aria-hidden="true">*</span>
+                <span class="sr-only">(obrigatório)</span>
+            @endif
         </label>
     @endunless
 

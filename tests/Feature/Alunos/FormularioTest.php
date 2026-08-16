@@ -69,6 +69,39 @@ final class FormularioTest extends ContextoDeAcademia
         $this->assertSame('Nome Novo', $aluno->fresh()->nome);
     }
 
+    /**
+     * O campo "Telefone" saiu do formulário, mas a coluna continua no banco
+     * para importação e uso futuro. Editar um aluno não pode apagar o que já
+     * estava lá só porque o campo não aparece mais na tela.
+     */
+    public function test_editar_nao_apaga_o_telefone_que_ja_existia(): void
+    {
+        $aluno = Aluno::factory()->create(['telefone' => '8533334444']);
+
+        Livewire::actingAs($this->usuarioCom('recepcao'))
+            ->test(Formulario::class, ['aluno' => $aluno])
+            ->set('nome', 'Nome Novo')
+            ->call('salvar')
+            ->assertHasNoErrors();
+
+        $this->assertSame('8533334444', $aluno->fresh()->telefone);
+    }
+
+    /** Campo obrigatório recebe asterisco; o opcional não recebe marca. */
+    public function test_obrigatorio_e_marcado_com_asterisco(): void
+    {
+        $html = $this->actingAs($this->usuarioCom('recepcao'))
+            ->get(route('alunos.novo'))
+            ->getContent();
+
+        // O rótulo obrigatório traz o asterisco e o texto para leitor de tela.
+        $this->assertStringContainsString('<span class="text-vencido-forte" aria-hidden="true">*</span>', $html);
+        $this->assertStringContainsString('<span class="sr-only">(obrigatório)</span>', $html);
+
+        // "(opcional)" saiu de vez.
+        $this->assertStringNotContainsString('(opcional)', $html);
+    }
+
     // -----------------------------------------------------------------
     // Validação
     // -----------------------------------------------------------------

@@ -26,7 +26,6 @@
                     rotulo="Nome completo"
                     wire:model.blur="nome"
                     placeholder="Jose Maria da Silva"
-                    ajuda="Gravado em caixa de título — digite como preferir."
                     autocomplete="off"
                 />
 
@@ -47,23 +46,13 @@
                     rotulo="Data de nascimento"
                     formato="data"
                     wire:model.blur="data_nascimento"
-                    ajuda="Digitada, sem calendário."
                 />
 
                 <x-ui.campo-mascara largura="25" nome="whatsapp" rotulo="WhatsApp" formato="celular"
                                     wire:model.blur="whatsapp" />
 
-                <x-ui.campo-mascara
-                    largura="25"
-                    nome="telefone"
-                    rotulo="Telefone"
-                    formato="celular"
-                    :obrigatorio="false"
-                    wire:model.blur="telefone"
-                />
-
                 <x-ui.campo
-                    largura="50"
+                    largura="25"
                     nome="email"
                     rotulo="E-mail"
                     tipo="email"
@@ -129,6 +118,9 @@
             <p class="mt-1 text-sm text-texto-mudo">Opcional. O CEP preenche o resto.</p>
 
             <x-ui.grade-formulario class="mt-6">
+                {{-- O `ajuda` do CEP fica vazio no uso normal: só aparece
+                     quando o endereço não pôde ser encontrado. Aviso de falha
+                     não é texto explicativo. --}}
                 <x-ui.campo-mascara
                     largura="25"
                     nome="cep"
@@ -136,7 +128,7 @@
                     formato="cep"
                     :obrigatorio="false"
                     wire:model.live.debounce.300ms="cep"
-                    :ajuda="$avisoCep ?: 'Preenche o endereço sozinho.'"
+                    :ajuda="$avisoCep ?: null"
                 />
 
                 <x-ui.campo largura="50" nome="logradouro" rotulo="Rua" :obrigatorio="false"
@@ -144,10 +136,10 @@
 
                 <x-ui.campo largura="25" nome="numero" rotulo="Número" :obrigatorio="false" wire:model.blur="numero" />
 
-                <x-ui.campo largura="50" nome="complemento" rotulo="Complemento" :obrigatorio="false"
+                <x-ui.campo largura="25" nome="complemento" rotulo="Complemento" :obrigatorio="false"
                             wire:model.blur="complemento" placeholder="Apto, bloco, referência" />
 
-                <x-ui.campo largura="50" nome="bairro" rotulo="Bairro" :obrigatorio="false" wire:model.blur="bairro" />
+                <x-ui.campo largura="25" nome="bairro" rotulo="Bairro" :obrigatorio="false" wire:model.blur="bairro" />
 
                 {{-- UF e cidade vêm do IBGE, nunca de digitação livre: texto
                      livre produz "Fortaleza", "fortaleza" e "Frotaleza" na
@@ -156,10 +148,10 @@
                               wire:model.live="uf" :opcoes="$estados" />
 
                 @if ($municipios === [])
-                    <x-ui.campo largura="75" nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model.blur="cidade"
-                                :ajuda="$uf === '' ? 'Escolha o estado primeiro.' : 'Lista do IBGE indisponível — digite à mão.'" />
+                    <x-ui.campo largura="25" nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model.blur="cidade"
+                                :ajuda="$uf !== '' ? 'Lista do IBGE indisponível — digite à mão.' : null" />
                 @else
-                    <x-ui.selecao largura="75" nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model="cidade"
+                    <x-ui.selecao largura="25" nome="cidade" rotulo="Cidade" :obrigatorio="false" wire:model="cidade"
                                   :opcoes="array_combine($municipios, $municipios)" />
                 @endif
             </x-ui.grade-formulario>

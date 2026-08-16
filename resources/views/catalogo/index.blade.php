@@ -182,44 +182,47 @@
                 declara se ocupa 25, 50, 75 ou 100 por cento. A largura acompanha o conteúdo esperado —
                 "Sexo" não merece o mesmo espaço de um nome completo.
             </p>
+            <p class="prosa mt-2 text-texto-2">
+                Obrigatório leva <span class="text-vencido-forte">*</span> ao lado do rótulo; opcional não leva
+                marca nenhuma. O espaço abaixo do campo fica reservado para <strong class="text-texto">aviso</strong>,
+                não para explicar o que o rótulo já diz.
+            </p>
 
-            <div class="mt-8 grid gap-6 md:grid-cols-2">
-                <x-ui.campo nome="nome_exemplo" rotulo="Nome completo" placeholder="Jose Maria da Silva"
-                            ajuda="Gravado em caixa de título, digite como digitar." />
+            {{-- As larguras aqui demonstram o critério: nome ocupa três
+                 quartos, documentos e datas ocupam um. --}}
+            <x-ui.grade-formulario class="mt-8">
+                <x-ui.campo largura="75" nome="nome_exemplo" rotulo="Nome completo"
+                            placeholder="Jose Maria da Silva" />
 
-                <x-ui.campo-mascara nome="cpf_exemplo" rotulo="CPF" formato="cpf"
-                                    ajuda="Dígitos verificadores conferidos ao sair do campo." />
+                <x-ui.selecao largura="25" nome="sexo_exemplo" rotulo="Sexo" :obrigatorio="false"
+                              :opcoes="['M' => 'Masculino', 'F' => 'Feminino']" />
 
-                <x-ui.campo-mascara nome="nascimento_exemplo" rotulo="Data de nascimento" formato="data"
-                                    ajuda="Digitada, sem calendário — no celular o teclado numérico é mais rápido." />
+                <x-ui.campo-mascara largura="25" nome="cpf_exemplo" rotulo="CPF" formato="cpf" />
 
-                <x-ui.campo-mascara nome="whatsapp_exemplo" rotulo="WhatsApp" formato="celular" />
+                <x-ui.campo-mascara largura="25" nome="nascimento_exemplo" rotulo="Data de nascimento" formato="data" />
 
-                <x-ui.campo-mascara nome="cep_exemplo" rotulo="CEP" formato="cep"
-                                    ajuda="Preenche o endereço pelo ViaCEP, mas não trava se não achar." />
+                <x-ui.campo-mascara largura="25" nome="whatsapp_exemplo" rotulo="WhatsApp" formato="celular" />
 
-                <x-ui.campo-mascara nome="cnpj_exemplo" rotulo="CNPJ" formato="cnpj" :obrigatorio="false" />
+                <x-ui.campo largura="25" nome="email_exemplo" rotulo="E-mail" tipo="email" :obrigatorio="false"
+                            placeholder="voce@academia.com.br" />
 
-                <x-ui.campo-dinheiro nome="valor_exemplo" rotulo="Valor da mensalidade"
-                                     ajuda="Digite da direita para a esquerda: 12990 vira 129,90." />
+                <x-ui.campo-mascara largura="25" nome="cep_exemplo" rotulo="CEP" formato="cep" :obrigatorio="false" />
 
-                <x-ui.selecao nome="plano_exemplo" rotulo="Plano" :opcoes="[
+                <x-ui.campo-mascara largura="25" nome="cnpj_exemplo" rotulo="CNPJ" formato="cnpj" :obrigatorio="false" />
+
+                <x-ui.campo-dinheiro largura="25" nome="valor_exemplo" rotulo="Valor da mensalidade" />
+
+                <x-ui.selecao largura="75" nome="plano_exemplo" rotulo="Plano" :opcoes="[
                     1 => 'Mensal · musculação — R$ 129,90',
                     2 => 'Trimestral · completo — R$ 289,00',
                     3 => 'Anual · completo — R$ 99,00/mês',
                 ]" />
 
-                <x-ui.campo nome="email_exemplo" rotulo="E-mail" tipo="email" :obrigatorio="false"
-                            placeholder="voce@academia.com.br" />
+                <x-ui.envio-imagem largura="25" nome="foto_exemplo" rotulo="Foto do aluno" />
 
-                <x-ui.envio-imagem nome="foto_exemplo" rotulo="Foto do aluno"
-                                   ajuda="Identificação da recepção. Não é template biométrico." />
-            </div>
-
-            <div class="mt-6">
-                <x-ui.area-texto nome="observacoes_exemplo" rotulo="Observações"
+                <x-ui.area-texto largura="75" nome="observacoes_exemplo" rotulo="Observações"
                                  placeholder="Restrição médica, preferência de horário…" />
-            </div>
+            </x-ui.grade-formulario>
 
             <div class="mt-8 flex max-w-md flex-col gap-5 rounded-lg border border-borda bg-superficie p-5">
                 <x-ui.caixa-selecao nome="aceite_exemplo" rotulo="Aceito ceder minha biometria para controle de acesso" />

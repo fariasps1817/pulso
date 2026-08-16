@@ -69,7 +69,22 @@ Digitou como digitou, grava `Jose Maria da Silva`. Regra completa em [`../domini
 - Nunca só a borda vermelha: **ícone + texto**, ligados ao campo por `aria-describedby`.
 - O texto diz a saída, não a culpa: *"Não foi possível ler a digital. Tente de novo ou use o cartão."*
 - Erro de formulário devolve o foco ao primeiro campo com problema.
-- Campo obrigatório é o padrão; o opcional é que vem marcado `(opcional)`. Numa ficha de aluno quase tudo é obrigatório — marcar asterisco em tudo é ruído.
+
+### 2.6 Obrigatório e opcional
+
+Campo obrigatório recebe **asterisco vermelho** ao lado do rótulo. O opcional **não recebe marca nenhuma** — nem a palavra "(opcional)", que ocupava espaço em quase todo rótulo e competia com o próprio nome do campo.
+
+A cor não carrega a informação sozinha (regra do guia de marca). São três camadas:
+
+1. o asterisco, que é símbolo e não só cor;
+2. o atributo `required` no campo, que o leitor de tela anuncia;
+3. um `(obrigatório)` oculto, para quem não distingue a cor nem ouve o atributo.
+
+### 2.7 Texto de ajuda: só quando há o que avisar
+
+Não se escreve embaixo do campo o que o rótulo já diz. "Nome completo" não precisa de "digite o nome completo", e "Data de nascimento" não precisa explicar que é digitada.
+
+O espaço abaixo do campo fica reservado para **aviso**, não para explicação: "CEP não encontrado — preencha o endereço à mão", "Lista do IBGE indisponível". Ajuda permanente em todo campo vira ruído, e o aviso que importa se perde no meio.
 
 ---
 
