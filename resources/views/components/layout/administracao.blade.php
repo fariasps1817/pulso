@@ -22,7 +22,16 @@
     ];
 @endphp
 
-<x-layout.base :titulo="$titulo">
+{{--
+    `com-livewire` é obrigatório aqui: as telas desta área são componentes
+    Livewire, e é esse sinalizador que traz o pacote `painel.js` — onde moram o
+    Livewire, o Alpine e os nossos plugins (notificações, máscaras).
+
+    Sem ele o Livewire ainda se injeta sozinho e a página até funciona, mas o
+    Alpine sobe sem os plugins: `notificacoesPulso is not defined` no console,
+    aviso de sucesso que nunca aparece e máscara de CNPJ que não formata.
+--}}
+<x-layout.base :titulo="$titulo" :com-livewire="true">
     <div class="min-h-dvh bg-fundo">
         <a href="#conteudo"
            class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50

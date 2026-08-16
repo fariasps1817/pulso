@@ -49,6 +49,16 @@
 
     @fonts
 
+    {{--
+        TODA tela com componente Livewire precisa de `com-livewire`.
+
+        Esquecer não quebra a página: o Livewire se injeta sozinho e o Alpine
+        dele sobe — só que sem os nossos plugins, que vivem em `painel.js`. O
+        sintoma é um erro no console ("notificacoesPulso is not defined"), o
+        aviso de sucesso que nunca aparece e a máscara que não formata. Nada
+        disso aparece em teste de servidor, e por isso há um caso em
+        tests/Feature/Interface cobrindo cada layout que usa Livewire.
+    --}}
     @if ($comLivewire)
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/painel.js'])

@@ -7,6 +7,7 @@
     propósito: quem chega ali tem uma coisa para fazer.
 --}}
 
-<x-layout.acesso :titulo="$titulo ?? null">
+{{-- Esta ponte so e usada por componente Livewire, entao o pacote vem sempre. --}}
+<x-layout.acesso :titulo="$titulo ?? null" :com-livewire="true">
     {{ $slot }}
 </x-layout.acesso>

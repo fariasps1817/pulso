@@ -2,6 +2,13 @@
     'titulo' => null,
     'chamada' => null,
     'apoio' => null,
+    /*
+     * Ligado apenas pelas telas que sao componentes Livewire — hoje, a troca
+     * da senha temporaria. O login e a redefinicao sao Blade puro, e carregar
+     * o pacote do painel neles custaria 270 KB na PRIMEIRA tela que alguem ve,
+     * quase sempre pelo celular.
+     */
+    'comLivewire' => false,
 ])
 
 {{--
@@ -9,7 +16,7 @@
     Nada compete com o formulario — quem chega aqui tem uma tarefa so.
 --}}
 
-<x-layout.base :titulo="$titulo" class="min-h-dvh bg-fundo text-texto antialiased">
+<x-layout.base :titulo="$titulo" :com-livewire="$comLivewire" class="min-h-dvh bg-fundo text-texto antialiased">
     <div class="flex min-h-dvh flex-col">
         <div class="flex items-center justify-end px-5 py-4">
             <x-ui.alternador-tema />
