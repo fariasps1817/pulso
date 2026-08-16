@@ -51,6 +51,19 @@ final class Plano extends Model
         return $this->hasMany(Matricula::class);
     }
 
+    /**
+     * Só as matrículas em vigor — ativas ou em experiência.
+     *
+     * Relacionamento próprio, e não filtro no `withCount`, para que a
+     * definição de "vigente" continue num lugar só e a contagem seja tipada.
+     *
+     * @return HasMany<Matricula, $this>
+     */
+    public function matriculasVigentes(): HasMany
+    {
+        return $this->matriculas()->vigentes();
+    }
+
     /** O plano concede período de teste? */
     public function temExperiencia(): bool
     {

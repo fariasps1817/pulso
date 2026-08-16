@@ -22,7 +22,7 @@
         ['id' => 'alunos', 'rotulo' => 'Alunos', 'icone' => 'M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7a6 6 0 0 1 12 0', 'principal' => true, 'url' => route('alunos.lista')],
         ['id' => 'matriculas', 'rotulo' => 'Matrículas', 'icone' => 'M5 3h10v14l-5-3-5 3V3Z', 'principal' => false],
         ['id' => 'mensalidades', 'rotulo' => 'Mensalidades', 'icone' => 'M2.5 6.5h15v9h-15v-9Zm0 3.5h15M5.5 13h3', 'principal' => true],
-        ['id' => 'planos', 'rotulo' => 'Planos', 'icone' => 'M3.5 5.5h13M3.5 10h13M3.5 14.5h8', 'principal' => false],
+        ['id' => 'planos', 'rotulo' => 'Planos', 'icone' => 'M3.5 5.5h13M3.5 10h13M3.5 14.5h8', 'principal' => false, 'url' => route('planos.lista')],
         ['id' => 'acesso', 'rotulo' => 'Acesso', 'icone' => 'M6.5 3h-3v3M13.5 3h3v3M6.5 17h-3v-3M13.5 17h3v-3M7.5 8v1M12.5 8v1M7.5 12.5s1 1 2.5 1 2.5-1 2.5-1', 'principal' => true],
         ['id' => 'configuracoes', 'rotulo' => 'Configurações', 'icone' => 'M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm7-2.5c0 .5-.05.9-.13 1.35l1.4 1.1-1.5 2.6-1.7-.6a6.6 6.6 0 0 1-2.3 1.35L12.5 18h-3l-.27-1.8a6.6 6.6 0 0 1-2.3-1.35l-1.7.6-1.5-2.6 1.4-1.1a6.7 6.7 0 0 1 0-2.7l-1.4-1.1 1.5-2.6 1.7.6a6.6 6.6 0 0 1 2.3-1.35L9.5 2h3l.27 1.8a6.6 6.6 0 0 1 2.3 1.35l1.7-.6 1.5 2.6-1.4 1.1c.08.45.13.85.13 1.35Z', 'principal' => false],
     ];

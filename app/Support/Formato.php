@@ -47,4 +47,33 @@ final class Formato
     {
         return 'R$ '.number_format((float) $valor, 2, ',', '.');
     }
+
+    /** Valor sem simbolo, para preencher campo de formulario: 1234.5 -> "1.234,50". */
+    public static function numeroDecimal(int|float|string|null $valor): string
+    {
+        return $valor === null ? '' : number_format((float) $valor, 2, ',', '.');
+    }
+
+    /**
+     * Caminho inverso: "1.234,56" -> "1234.56".
+     *
+     * O campo de dinheiro digita da direita para a esquerda e entrega texto no
+     * formato brasileiro. Mandar isso direto para uma coluna numeric daria
+     * erro de conversao — ou, pior, gravaria 1.23 no lugar de 1234.56.
+     */
+    public static function decimalDoFormulario(?string $valor): ?string
+    {
+        if ($valor === null || trim($valor) === '') {
+            return null;
+        }
+
+        $digitos = preg_replace('/\D/', '', $valor) ?? '';
+
+        if ($digitos === '') {
+            return null;
+        }
+
+        // O campo sempre entrega duas casas decimais.
+        return bcdiv($digitos, '100', 2);
+    }
 }
