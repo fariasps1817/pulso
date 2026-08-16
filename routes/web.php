@@ -7,6 +7,7 @@ use App\Http\Controllers\UnidadeAtualController;
 use App\Livewire\Acesso;
 use App\Livewire\Administracao;
 use App\Livewire\Alunos;
+use App\Livewire\Configuracoes as ConfiguracoesDaAcademia;
 use App\Livewire\Matriculas;
 use App\Livewire\Mensalidades;
 use App\Livewire\Painel;
@@ -108,6 +109,11 @@ Route::middleware(['auth'])->group(function (): void {
      * cobranca entram aqui.
      */
     Route::view('/configuracoes', 'configuracoes.painel')->name('configuracoes.painel');
+
+    Route::prefix('configuracoes')->name('configuracoes.')->group(function (): void {
+        Route::get('/academia', ConfiguracoesDaAcademia\DadosDaAcademia::class)->name('academia');
+        Route::get('/regras', ConfiguracoesDaAcademia\RegrasDaAcademia::class)->name('regras');
+    });
 
     Route::prefix('configuracoes/usuarios')->name('usuarios.')->group(function (): void {
         Route::get('/', Usuarios\Lista::class)->name('lista');

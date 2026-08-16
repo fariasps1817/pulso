@@ -656,6 +656,60 @@ Guardadas em `users.preferencias` (JSONB), aplicadas no login em qualquer aparel
 
 O tema já é guardado no navegador para não piscar antes da primeira pintura; o valor do perfil é o que manda quando o usuário entra em outro aparelho.
 
+### 5.9 Segurança do acesso
+
+Três travas, e o que cada uma impede de verdade.
+
+#### 5.9.1 Bloqueio por tentativas
+
+Duas contagens, porque são dois ataques diferentes:
+
+| Contagem | Limite | Por quê |
+|---|---|---|
+| Por e-mail | 5 erros em 15 min | Alguém martelando a conta da recepção. Quem sabe a senha acerta em duas ou três. |
+| Por IP | 20 erros em 15 min | Alguém varrendo uma lista de e-mails da mesma máquina. Limite alto porque a academia inteira sai por um IP só. |
+
+**A mensagem é idêntica** para bloqueio por e-mail, por IP e para e-mail que nem existe — e a contagem é por *texto digitado*, não por conta encontrada. Se o bloqueio só valesse para e-mail existente, a diferença entre "senha incorreta" e "muitas tentativas" viraria um confirmador de contas. Há teste comparando as duas mensagens.
+
+A janela é **deslizante**, sem coluna de estado: não há rotina de desbloqueio e, portanto, não há como alguém ficar preso porque um agendador falhou.
+
+> **Armadilha encontrada:** o Fortify chama a autenticação **duas vezes** no mesmo pedido — uma em `RedirectIfTwoFactorAuthenticatable`, outra em `AttemptToAuthenticate`. Sem memorizar o resultado no objeto da requisição, cada senha errada contava por duas e a porta fechava com três tentativas em vez de cinco.
+
+O limitador do Fortify (5 por minuto) continua ativo por cima: ele segura a rajada, o porteiro segura a insistência ao longo de quinze minutos — que é o ataque que de fato acontece.
+
+Toda tentativa, inclusive a barrada, entra em `tentativas_login`. Sem registrar as barradas, o histórico mostraria cinco tentativas e um silêncio, e não daria para saber se o atacante desistiu ou continuou batendo na porta trancada.
+
+#### 5.9.2 Encerramento por inatividade
+
+O caso real: computador de balcão, num salão por onde passam cem pessoas por dia. Sessão aberta ali é a ficha de todo mundo à disposição de quem mexer no mouse.
+
+Não é o `SESSION_LIFETIME` do Laravel, que expira por tempo desde a criação e é global. Aqui o prazo é de **inatividade** — quem está atendendo não é interrompido — e é **por usuário**: `users.minutos_inatividade`, com 30 de padrão. Zero desliga, que é escolha legítima para a máquina trancada da sala da direção.
+
+O relógio fica na sessão, não no banco: gravar a cada requisição custaria uma escrita por clique.
+
+#### 5.9.3 Sessão única
+
+Ligada por padrão. Entrar num aparelho derruba os outros.
+
+O motivo é concreto: a senha da recepção circula. Sem isso, uma senha emprestada "só para ver uma coisa" vira um segundo acesso permanente e ninguém percebe, porque nada deixa de funcionar. Com isso, a pessoa é derrubada e pergunta o porquê — o problema aparece.
+
+**Depende de `SESSION_DRIVER=database`.** Com sessão em arquivo não há tabela para varrer, e a opção não teria efeito — silenciosamente, que é o pior jeito de uma trava de segurança falhar. Por isso a verificação é explícita no código.
+
+### 5.10 O que a academia configura
+
+| Ajuste | Efeito |
+|---|---|
+| Razão social, CNPJ, endereço, logotipo | Cabeçalho dos recibos e contratos em PDF |
+| Dias de tolerância (0–30) | Quando a catraca para de liberar quem está devendo |
+| Baixa frequência (7–90 dias) | Quem aparece no Radar como sumido |
+| Idade mínima | Abaixo dela o balcão não conclui a matrícula |
+
+Fica com o **dono**, não com o gerente: o que se ajusta ali muda o documento que o aluno leva para casa e o dia em que ele para de passar na catraca.
+
+Os limites não são decoração. Acima de 30 dias de tolerância a catraca deixa de servir como cobrança, que é metade da razão de ela existir; abaixo de 7 dias de baixa frequência, quem viajou uma semana já apareceria como sumido.
+
+> Há teste provando que mudar a baixa frequência **muda quem o Radar aponta**. Configuração que não muda nada é pior do que configuração nenhuma: dá a impressão de estar no controle.
+
 ### 5.8 Segurança de acesso
 
 **Bloqueio por tentativas** — dois limitadores independentes, porque atacam de dois jeitos:

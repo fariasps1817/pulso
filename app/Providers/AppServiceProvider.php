@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Listeners\EncerrarOutrasSessoes;
 use App\Support\Academia\ContextoAcademia;
 use App\Support\Catraca\AparelhoAtual;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -36,5 +39,8 @@ class AppServiceProvider extends ServiceProvider
         // Atribuir coluna que não existe no model deixa de ser ignorado em
         // silêncio. Erro de digitação em `update()` é achado no mesmo dia.
         Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
+
+        // Sessao unica: entrar num aparelho derruba os outros.
+        Event::listen(Login::class, EncerrarOutrasSessoes::class);
     }
 }

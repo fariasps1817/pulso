@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\DefinirAcademiaAtual;
+use App\Http\Middleware\EncerrarPorInatividade;
 use App\Http\Middleware\ExigirAcademiaAtiva;
 use App\Http\Middleware\ExigirTrocaDeSenha;
 use App\Http\Middleware\SepararSuperAdministrador;
@@ -36,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->web(append: [
             DefinirAcademiaAtual::class,
+            EncerrarPorInatividade::class,
             ExigirAcademiaAtiva::class,
             SepararSuperAdministrador::class,
             ExigirTrocaDeSenha::class,

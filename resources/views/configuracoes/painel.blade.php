@@ -5,6 +5,8 @@
     />
 
     @php
+        $podeConfigurar = auth()->user()->can('configurar', auth()->user()->academia);
+
         $areas = [
             [
                 'rotulo' => 'Usuários',
@@ -13,8 +15,8 @@
             ],
             [
                 'rotulo' => 'Dados da academia',
-                'descricao' => 'Razão social, CNPJ e logotipo — usados nos recibos e contratos em PDF.',
-                'url' => null,
+                'descricao' => 'Razão social, CNPJ, endereço e logotipo — o cabeçalho dos recibos e contratos.',
+                'url' => $podeConfigurar ? route('configuracoes.academia') : null,
             ],
             [
                 'rotulo' => 'Unidades',
@@ -22,9 +24,9 @@
                 'url' => null,
             ],
             [
-                'rotulo' => 'Regras de cobrança',
-                'descricao' => 'Dias de tolerância antes de bloquear na catraca, e o que conta como baixa frequência.',
-                'url' => null,
+                'rotulo' => 'Regras da academia',
+                'descricao' => 'Tolerância antes de a catraca bloquear, baixa frequência e idade mínima.',
+                'url' => $podeConfigurar ? route('configuracoes.regras') : null,
             ],
         ];
     @endphp

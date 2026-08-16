@@ -156,6 +156,17 @@ Na VPS, um cron chama o agendador do Laravel a cada minuto:
 
 A geração é **idempotente**: o índice único `(matricula_id, competencia)` impede duplicata, então rodar de novo é seguro. Roda pela conexão da aplicação — percorre as academias definindo o contexto de cada uma, e o RLS a autoriza uma a uma, sem precisar de um papel que atravessa o isolamento.
 
+## Segurança do acesso
+
+| Trava | Como funciona |
+|---|---|
+| Tentativas de login | 5 erros por e-mail ou 20 por IP em 15 minutos fecham a porta. Janela deslizante, sem rotina de desbloqueio. |
+| Inatividade | Sessão parada encerra. Prazo por usuário (`minutos_inatividade`), 30 min de padrão; zero desliga. |
+| Sessão única | Entrar num aparelho derruba os outros. Ligada por padrão. **Exige `SESSION_DRIVER=database`.** |
+| Senha temporária | Usuário novo troca a senha no primeiro acesso, antes de chegar a qualquer tela. |
+
+A mensagem de bloqueio é **idêntica** para conta existente e inexistente, e a contagem é por texto digitado — senão a tela de login vira um confirmador de contas.
+
 ## As duas áreas do sistema
 
 | Área | Quem entra | Endereço |
@@ -225,5 +236,6 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 6b. Biometria: cadastro facial e digital pelo Pulso | ⬜ |
 | 7a. Área do super administrador — academias, bloqueio e cobrança | ✅ concluída |
 | 7b. Cadastro da equipe pela própria academia | ✅ concluída |
+| 7c. Configurações da academia e segurança do acesso | ✅ concluída |
 | 8. Notificações por WhatsApp | ⬜ próxima |
 | 9. Deploy na VPS | ⬜ |
