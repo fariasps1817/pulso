@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Casts\CaixaDeTitulo;
 use App\Enums\SituacaoAcademia;
+use Carbon\CarbonImmutable;
 use Database\Factories\AcademiaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +38,45 @@ final class Academia extends Model
             'dias_tolerancia_bloqueio' => 'integer',
             'dias_baixa_frequencia' => 'integer',
             'idade_minima' => 'integer',
+            'total_alunos_ativos' => 'integer',
+            'contagem_atualizada_em' => 'immutable_datetime',
         ];
+    }
+
+    /**
+     * Recalcula quantos alunos ativos a academia tem.
+     *
+     * RECONTA em vez de somar ou subtrair um. Contador incrementado a cada
+     * evento acumula erro — uma exceção no meio de uma transação, uma
+     * importação em massa, um `delete` em cascata — e o desvio só aparece
+     * meses depois, numa fatura errada. A consulta a mais é o preço de o
+     * número não precisar de auditoria.
+     *
+     * Roda por baixo do Row Level Security, então exige o contexto definido:
+     * é a aplicação contando os PRÓPRIOS alunos, não o super administrador
+     * contando os alheios.
+     */
+    public function recontarAlunosAtivos(): int
+    {
+        $total = Matricula::query()->vigentes()->distinct()->count('aluno_id');
+
+        $this->forceFill([
+            'total_alunos_ativos' => $total,
+            'contagem_atualizada_em' => CarbonImmutable::now(),
+        ])->saveQuietly();
+
+        return $total;
+    }
+
+    /**
+     * A academia tem filial?
+     *
+     * Esta o super administrador conta direto: `unidades` é plano de
+     * controle, e fica fora do isolamento.
+     */
+    public function temFilial(): bool
+    {
+        return $this->unidades()->where('ativa', true)->count() > 1;
     }
 
     /** @return HasMany<Unidade, $this> */

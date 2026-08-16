@@ -5,11 +5,13 @@ declare(strict_types=1);
 use App\Http\Controllers\PreferenciaController;
 use App\Http\Controllers\UnidadeAtualController;
 use App\Livewire\Acesso;
+use App\Livewire\Administracao;
 use App\Livewire\Alunos;
 use App\Livewire\Matriculas;
 use App\Livewire\Mensalidades;
 use App\Livewire\Painel;
 use App\Livewire\Planos;
+use App\Livewire\Usuarios;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +39,12 @@ Route::view('/', 'site.inicio')->name('site.inicio');
 */
 
 Route::redirect('/entrar', '/login')->name('acesso.entrar');
+
+/*
+ * Troca da senha temporaria. Autenticada, mas FORA do painel: quem chega aqui
+ * ainda nao passou pela porta que o middleware ExigirTrocaDeSenha guarda.
+ */
+Route::middleware(['auth'])->get('/senha', Acesso\TrocarSenha::class)->name('senha.trocar');
 Route::redirect('/esqueci-a-senha', '/forgot-password')->name('acesso.esqueci-a-senha');
 
 /*
@@ -94,11 +102,47 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('/{mensalidade}', Mensalidades\Detalhes::class)->name('detalhes');
     });
 
+    /*
+     * Configuracoes da academia — o guarda-chuva do que ela ajusta por conta
+     * propria. Hoje so usuarios; dados da academia, unidades e regras de
+     * cobranca entram aqui.
+     */
+    Route::view('/configuracoes', 'configuracoes.painel')->name('configuracoes.painel');
+
+    Route::prefix('configuracoes/usuarios')->name('usuarios.')->group(function (): void {
+        Route::get('/', Usuarios\Lista::class)->name('lista');
+        Route::get('/novo', Usuarios\Formulario::class)->name('novo');
+        Route::get('/{usuario}/editar', Usuarios\Formulario::class)->name('editar');
+    });
+
     Route::prefix('planos')->name('planos.')->group(function (): void {
         Route::get('/', Planos\Lista::class)->name('lista');
         Route::get('/novo', Planos\Formulario::class)->name('novo');
         Route::get('/{plano}', Planos\Detalhes::class)->name('detalhes');
         Route::get('/{plano}/editar', Planos\Formulario::class)->name('editar');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Administracao do SaaS (super administrador)
+|--------------------------------------------------------------------------
+|
+| A area da equipe do Pulso. Quem entra aqui tem `academia_id` nulo — nao
+| pertence a academia nenhuma —, e por isso as politicas de Row Level Security
+| nao casam com linha nenhuma para ele: aluno, mensalidade e biometria ficam
+| fora do alcance mesmo com a conta comprometida.
+|
+| O middleware SepararSuperAdministrador cuida das duas direcoes: manda o
+| super administrador para ca, e barra a academia que tente entrar.
+|
+*/
+
+Route::middleware(['auth'])->prefix('administracao')->name('administracao.')->group(function (): void {
+    Route::prefix('academias')->name('academias.')->group(function (): void {
+        Route::get('/', Administracao\Academias::class)->name('lista');
+        Route::get('/nova', Administracao\NovaAcademia::class)->name('nova');
+        Route::get('/{academia}', Administracao\DetalhesDaAcademia::class)->name('detalhes');
     });
 });
 

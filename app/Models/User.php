@@ -26,7 +26,19 @@ use Spatie\Permission\Traits\HasRoles;
  * não abrem exceção para ele, então aluno, mensalidade e biometria continuam
  * fora do seu alcance mesmo que a conta seja comprometida.
  */
-#[Fillable(['name', 'email', 'password', 'preferencias'])]
+/*
+ * Lista explícita, e não `guarded`: o que NÃO está aqui é o que o sistema
+ * escreve sozinho — `bloqueado_ate` e `ultimo_acesso_em` vêm das tentativas de
+ * login, e os campos de dois fatores, do Fortify. Nenhum deles deve chegar por
+ * formulário.
+ */
+#[Fillable([
+    'name', 'email', 'password', 'preferencias',
+    'academia_id', 'unidade_padrao_id',
+    'acessa_todas_unidades', 'pode_alternar_unidade',
+    'sessao_unica', 'minutos_inatividade',
+    'ativo', 'deve_trocar_senha',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -49,6 +61,7 @@ class User extends Authenticatable
             'acessa_todas_unidades' => 'boolean',
             'pode_alternar_unidade' => 'boolean',
             'ativo' => 'boolean',
+            'deve_trocar_senha' => 'boolean',
             'bloqueado_ate' => 'datetime',
             'ultimo_acesso_em' => 'datetime',
         ];

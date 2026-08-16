@@ -156,6 +156,19 @@ Na VPS, um cron chama o agendador do Laravel a cada minuto:
 
 A geração é **idempotente**: o índice único `(matricula_id, competencia)` impede duplicata, então rodar de novo é seguro. Roda pela conexão da aplicação — percorre as academias definindo o contexto de cada uma, e o RLS a autoriza uma a uma, sem precisar de um papel que atravessa o isolamento.
 
+## As duas áreas do sistema
+
+| Área | Quem entra | Endereço |
+|---|---|---|
+| Painel da academia | quem tem `academia_id` | `/painel` |
+| Administração do SaaS | quem tem `academia_id` **nulo** | `/administracao` |
+
+O super administrador é a equipe do Pulso. Ele **não pertence a academia nenhuma**, e é isso — não um papel atribuído por tela — que define quem ele é. Como as políticas de Row Level Security comparam `academia_id` com o contexto da requisição, e o dele é vazio, **nenhuma linha de aluno, mensalidade ou biometria aparece para ele**. Não há exceção no banco.
+
+O que ele alcança é o plano de controle: `academias`, `unidades`, `avisos_academia` e `users` — esta última porque a autenticação precisa acontecer antes de existir "academia atual".
+
+**O custo disso é o suporte:** não dá para ver a tela do cliente. A troca vale porque uma conta da equipe do Pulso comprometida não abre a base de nenhum cliente. Se o suporte se mostrar inviável, a saída é impersonação auditada — não abrir o RLS.
+
 ## Catraca e leitor biométrico
 
 Equipamento adotado: **ZKTeco SenseFace 2A** (protocolo PUSH/ADMS), acionando uma catraca genérica por contato seco.
@@ -209,6 +222,8 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 4b. Cobrança online (Pix) — provedor a definir | ⬜ |
 | 5. Radar — inadimplência, baixa frequência, risco de evasão e aniversariantes | ✅ concluída |
 | 6a. Catraca: protocolo do leitor, entrada/saída, tela e simulador | ✅ concluída |
-| 6b. Biometria: cadastro facial e digital pelo Pulso | ⬜ próxima |
-| 7. Notificações por WhatsApp | ⬜ |
-| 8. Deploy na VPS | ⬜ |
+| 6b. Biometria: cadastro facial e digital pelo Pulso | ⬜ |
+| 7a. Área do super administrador — academias, bloqueio e cobrança | ✅ concluída |
+| 7b. Cadastro da equipe pela própria academia | ✅ concluída |
+| 8. Notificações por WhatsApp | ⬜ próxima |
+| 9. Deploy na VPS | ⬜ |

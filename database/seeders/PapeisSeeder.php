@@ -45,6 +45,12 @@ final class PapeisSeeder extends Seeder
         'gerente' => [
             'academia.ver',
             'unidade.ver',
+            /*
+             * Cadastra a equipe do balcão dele — recepção e professor —, mas
+             * não exclui ninguém e não cria gerente nem dono. A hierarquia em
+             * si mora em Support\Academia\Papeis; aqui está só a porta.
+             */
+            'usuario.ver', 'usuario.criar', 'usuario.editar',
             'plano.ver',
             'aluno.ver', 'aluno.criar', 'aluno.editar', 'aluno.excluir',
             'matricula.ver', 'matricula.criar', 'matricula.editar', 'matricula.encerrar',

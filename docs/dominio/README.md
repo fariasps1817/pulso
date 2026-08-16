@@ -592,6 +592,53 @@ O Radar não é painel de gráficos: é a lista do que fazer hoje. Cada cartão 
 
 O super administrador nunca apaga uma academia: muda a situação.
 
+#### 5.6.1 O que a mudança de situação faz de verdade
+
+| Situação | Equipe entra? | Catraca libera aluno? |
+|---|---|---|
+| `ativa` | sim | sim |
+| `em_aviso` | sim | sim |
+| `bloqueada` | **não** | **sim** |
+| `cancelada` | não | não |
+
+A linha do meio é a que importa: **a catraca continua girando com a academia bloqueada**. As rotas do aparelho biométrico não passam pelo middleware que barra a equipe, e isso é deliberado — deixar aluno na porta por briga comercial entre a academia e o Pulso puniria quem não tem nada com isso. Quem pagou a mensalidade dele treina.
+
+O bloqueio **exige motivo**, guardado em `motivo_bloqueio`. É interno: a academia vê que está suspensa, não o texto. Sem ele, quem atender o telefone dela amanhã não teria resposta.
+
+#### 5.6.2 Como uma academia nasce
+
+Academia, **primeira unidade** e **primeiro dono**, na mesma transação. Criar só a academia produziria um cliente inacessível: sem unidade não há onde matricular ninguém, e sem usuário não há quem entre — e o super administrador não pode suprir a falta depois, porque não enxerga o interior de academia nenhuma. Teria que mexer no banco.
+
+O dono recebe uma senha temporária, mostrada uma vez na tela para a equipe do Pulso repassar na entrega, e trocada obrigatoriamente no primeiro acesso.
+
+#### 5.6.3 O número de alunos, sem ler os alunos
+
+A cobrança do SaaS depende do porte da academia e de ela ter filial. Filial o super administrador conta direto — `unidades` é plano de controle. Aluno, não: as políticas de RLS não abrem para ele.
+
+Então `academias.total_alunos_ativos` guarda o número, mantido pela **própria academia** (que tem contexto) a cada mudança de matrícula. O super administrador lê um número, nunca uma pessoa.
+
+O total é **recontado**, não incrementado. Contador que soma e subtrai a cada evento acumula erro — uma exceção no meio de uma transação, uma importação, um `delete` em cascata — e o desvio só aparece meses depois, numa fatura errada.
+
+### 5.8 Cadastro da equipe pela própria academia
+
+O gestor cadastra quem trabalha com ele. Três travas sustentam a tela:
+
+**1. Ninguém cria alguém acima de si.** O dono atribui qualquer papel; o gerente, só recepção e professor. Sem isso, um gerente cadastraria um dono, entraria com ele e teria a rede inteira — sem invadir nada, só usando o formulário. A hierarquia mora em `Support\Academia\Papeis`, e vale também para *editar*: mudar o papel de alguém é criar naquele papel por outro caminho.
+
+**2. Ninguém edita a própria conta por essa tela.** Um dono que se rebaixe por engano tranca a academia, e a saída seria mexer no banco. Dados pessoais e senha se mudam no perfil.
+
+**3. Desativar é o "excluir".** O usuário não sai do banco: ele responde por mensalidade recebida e por biometria cadastrada, e apagar a linha deixaria esse histórico órfão.
+
+#### 5.8.1 A senha temporária
+
+O sistema gera; ninguém digita. Ela aparece **uma vez** na tela, para o gestor repassar, e o primeiro acesso exige a troca — enquanto `deve_trocar_senha` for verdadeiro, o usuário não chega a tela nenhuma (só a troca e o "Sair").
+
+Duas razões: não depende de e-mail configurado, e **o gestor nunca fica sabendo a senha definitiva de ninguém** — o que importa porque a conta dele assina recebimento de dinheiro. Senha escolhida por terceiro vira "academia123" para a equipe inteira.
+
+O alfabeto da senha exclui caracteres que se confundem ao telefone (`0`/`O`, `1`/`l`/`I`): o gestor vai ditar isso para alguém.
+
+> **Limitação assumida:** `users.email` é único no sistema inteiro. A mesma pessoa não pode ter acesso a duas academias com o mesmo e-mail. Vale enquanto a rede for o caso comum e o profissional itinerante, a exceção.
+
 ### 5.7 Preferências do usuário
 
 Guardadas em `users.preferencias` (JSONB), aplicadas no login em qualquer aparelho:

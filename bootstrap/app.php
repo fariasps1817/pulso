@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\DefinirAcademiaAtual;
+use App\Http\Middleware\ExigirAcademiaAtiva;
+use App\Http\Middleware\ExigirTrocaDeSenha;
+use App\Http\Middleware\SepararSuperAdministrador;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,8 +28,17 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        /*
+         * A ordem conta uma historia: primeiro descobre-se de qual academia e
+         * a requisicao, depois se ela pode entrar, depois se o super
+         * administrador esta no lugar certo, e so entao se a senha ainda e
+         * temporaria.
+         */
         $middleware->web(append: [
             DefinirAcademiaAtual::class,
+            ExigirAcademiaAtiva::class,
+            SepararSuperAdministrador::class,
+            ExigirTrocaDeSenha::class,
         ]);
 
         /*

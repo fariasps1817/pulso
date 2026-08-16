@@ -48,9 +48,35 @@ final class Matricula extends Model
         ];
     }
 
+    /**
+     * Toda mudança de matrícula reconta os alunos ativos da academia.
+     *
+     * O número alimenta a cobrança do SaaS, e é o único jeito de o super
+     * administrador saber o porte da academia sem enxergar os alunos dela —
+     * o Row Level Security não abre exceção nem para ele.
+     *
+     * `saved` cobre criação e alteração; `deleted`, o encerramento por
+     * exclusão. A recontagem é uma consulta agregada, e matrícula muda pouco.
+     */
+    protected static function booted(): void
+    {
+        $recontar = static function (self $matricula): void {
+            $matricula->academia?->recontarAlunosAtivos();
+        };
+
+        self::saved($recontar);
+        self::deleted($recontar);
+    }
+
     // ---------------------------------------------------------------------
     // Relacionamentos
     // ---------------------------------------------------------------------
+
+    /** @return BelongsTo<Academia, $this> */
+    public function academia(): BelongsTo
+    {
+        return $this->belongsTo(Academia::class);
+    }
 
     /** @return BelongsTo<Aluno, $this> */
     public function aluno(): BelongsTo
@@ -202,6 +228,20 @@ final class Matricula extends Model
             SituacaoMatricula::Ativa,
             SituacaoMatricula::Experiencia,
             SituacaoMatricula::Suspensa,
+        ], true);
+    }
+
+    /**
+     * Está valendo hoje?
+     *
+     * Mesma definição do scope abaixo, para a tela não reescrever a regra.
+     * Trancada não conta: o aluno não pode treinar enquanto estiver assim.
+     */
+    public function estaVigente(): bool
+    {
+        return in_array($this->situacao, [
+            SituacaoMatricula::Ativa,
+            SituacaoMatricula::Experiencia,
         ], true);
     }
 
