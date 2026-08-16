@@ -56,6 +56,15 @@ class UserFactory extends Factory
         ]);
     }
 
+    /** Enxerga e opera todas as unidades da academia — o caso do dono. */
+    public function comTodasAsUnidades(): static
+    {
+        return $this->state(fn (array $atributos): array => [
+            'acessa_todas_unidades' => true,
+            'pode_alternar_unidade' => true,
+        ]);
+    }
+
     /**
      * Indicate that the model's email address should be unverified.
      */

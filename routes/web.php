@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\PreferenciaController;
+use App\Http\Controllers\UnidadeAtualController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +47,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::view('/painel', 'painel.inicio')->name('painel.inicio');
 
     Route::post('/preferencias', [PreferenciaController::class, 'salvar'])->name('preferencias.salvar');
+    Route::post('/unidade-atual', [UnidadeAtualController::class, 'trocar'])->name('painel.trocar-unidade');
 });
 
 /*

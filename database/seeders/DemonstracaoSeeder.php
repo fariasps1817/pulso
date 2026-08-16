@@ -15,6 +15,7 @@ use App\Models\Plano;
 use App\Models\Unidade;
 use App\Models\User;
 use App\Support\Academia\ContextoAcademia;
+use App\Support\Academia\PadroesDeAcesso;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -102,13 +103,18 @@ final class DemonstracaoSeeder extends Seeder
             'name' => $nomeDono,
             'email' => "dono@{$apelido}.com.br",
             'password' => Hash::make('pulso1234'),
+            ...PadroesDeAcesso::paraPapel('dono'),
         ]);
         $dono->assignRole('dono');
 
+        // A recepção nasce travada na unidade dela: quem atende num balcão não
+        // tem por que ver o movimento de outro.
         $recepcao = User::factory()->daAcademia($academia->id)->create([
             'name' => $nomeRecepcao,
             'email' => "recepcao@{$apelido}.com.br",
             'password' => Hash::make('pulso1234'),
+            'unidade_padrao_id' => $unidade->id,
+            ...PadroesDeAcesso::paraPapel('recepcao'),
         ]);
         $recepcao->assignRole('recepcao');
         $recepcao->unidades()->attach($unidade->id);

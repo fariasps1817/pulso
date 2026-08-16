@@ -8,6 +8,7 @@ use App\Models\Academia;
 use App\Models\Unidade;
 use App\Models\User;
 use App\Support\Academia\ContextoAcademia;
+use App\Support\Academia\PadroesDeAcesso;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -20,7 +21,10 @@ final class CabecalhoTest extends TestCase
         app(ContextoAcademia::class)->definir($academia->id);
         setPermissionsTeamId($academia->id);
 
-        $usuario = User::factory()->daAcademia($academia->id)->create(['name' => $nome]);
+        $usuario = User::factory()->daAcademia($academia->id)->create([
+            'name' => $nome,
+            ...PadroesDeAcesso::paraPapel('dono'),
+        ]);
         $usuario->assignRole('dono');
 
         return $usuario;

@@ -139,7 +139,20 @@ Convenções aplicadas a todas: chave `bigint` gerada por identidade, `created_a
 | `bloqueado_ate` | timestamptz, nulo | Preenchido pelo bloqueio por tentativas — ver §5.8 |
 | `ultimo_acesso_em` | timestamptz, nulo | |
 
-**`unidade_user`** — a quais unidades cada usuário tem acesso. Sem linha aqui, o usuário enxerga todas as unidades da academia (caso do dono).
+**`unidade_user`** — as unidades vinculadas explicitamente ao usuário.
+
+> **Vínculo vazio não significa "todas".** Quem enxerga a rede inteira tem `acessa_todas_unidades` marcado. A regra anterior — sem vínculo, vê tudo — falhava **abrindo**: uma recepcionista cadastrada às pressas ganhava a academia inteira, em silêncio. Contradizia o princípio usado no resto do sistema, onde sem academia definida o banco devolve zero linhas.
+
+Como um usuário novo nasce, conforme o papel (`App\Support\Academia\PadroesDeAcesso`):
+
+| Papel | Acessa todas | Pode alternar |
+|---|:--:|:--:|
+| `dono` | ✅ | ✅ |
+| `gerente` | — (escolhe quais) | ✅ |
+| `recepcao` | — (escolhe quais) | — travado |
+| `professor` | — (escolhe quais) | — travado |
+
+Quem não pode alternar vê **texto simples** no cabeçalho, não uma lista desabilitada: controle desligado na tela anuncia algo que a pessoa não pode fazer, e isso só gera pergunta para o gerente.
 
 **`tentativas_login`** — trilha de auditoria das tentativas.
 

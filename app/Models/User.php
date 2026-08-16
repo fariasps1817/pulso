@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -45,6 +46,8 @@ class User extends Authenticatable
             // lista cresce, e cada item novo viraria uma migration.
             'preferencias' => 'array',
             'sessao_unica' => 'boolean',
+            'acessa_todas_unidades' => 'boolean',
+            'pode_alternar_unidade' => 'boolean',
             'ativo' => 'boolean',
             'bloqueado_ate' => 'datetime',
             'ultimo_acesso_em' => 'datetime',
@@ -62,17 +65,86 @@ class User extends Authenticatable
     }
 
     /**
-     * Unidades a que o usuário tem acesso.
+     * Unidades vinculadas explicitamente ao usuário.
      *
-     * Sem nenhuma linha aqui, o usuário enxerga TODAS as unidades da academia
-     * — é o caso do dono, e evita ter de criar um vínculo novo toda vez que
-     * uma filial abre.
+     * **Vínculo vazio não significa "todas".** Quem enxerga a rede inteira tem
+     * `acessa_todas_unidades` marcado. Antes, a ausência de vínculo liberava
+     * tudo — e uma recepcionista cadastrada às pressas ganhava a academia
+     * inteira, em silêncio.
      *
      * @return BelongsToMany<Unidade, $this>
      */
     public function unidades(): BelongsToMany
     {
         return $this->belongsToMany(Unidade::class, 'unidade_user')->withTimestamps();
+    }
+
+    /** @return BelongsTo<Unidade, $this> */
+    public function unidadePadrao(): BelongsTo
+    {
+        return $this->belongsTo(Unidade::class, 'unidade_padrao_id');
+    }
+
+    /**
+     * As unidades que este usuário pode operar, já ordenadas.
+     *
+     * Por cadastro, e não por nome: a unidade registrada primeiro é a
+     * principal, e é ela que deve abrir por padrão. Alfabético faria a rede
+     * abrir na "Aldeota" em vez da "Matriz".
+     *
+     * @return Collection<int, Unidade>
+     */
+    public function unidadesAcessiveis(): Collection
+    {
+        if ($this->academia_id === null) {
+            return collect();
+        }
+
+        /*
+         * Colunas qualificadas: o caminho pelo vínculo faz join com
+         * `unidade_user`, e tanto `id` quanto `ativa` ficariam ambíguos — o
+         * PostgreSQL recusa a consulta em vez de escolher por conta própria.
+         */
+        $consulta = $this->acessa_todas_unidades
+            ? Unidade::query()->where('unidades.academia_id', $this->academia_id)
+            : $this->unidades()->getQuery();
+
+        /*
+         * `select unidades.*` é obrigatório no caminho pelo vínculo: com
+         * `select *`, o join traz também o `id` de `unidade_user`, e como ele
+         * vem depois, sobrescreve o da unidade. O model sairia com o id
+         * errado, e comparar unidades passaria a dar falso silenciosamente.
+         */
+        return $consulta
+            ->select('unidades.*')
+            ->where('unidades.ativa', true)
+            ->orderBy('unidades.id')
+            ->get();
+    }
+
+    /**
+     * A unidade em que o usuário está operando.
+     *
+     * Preferência de sessão só vale para quem pode alternar; do contrário,
+     * bastaria forjar a preferência para escapar do travamento.
+     */
+    public function unidadeAtual(): ?Unidade
+    {
+        $acessiveis = $this->unidadesAcessiveis();
+
+        if ($acessiveis->isEmpty()) {
+            return null;
+        }
+
+        if ($this->pode_alternar_unidade) {
+            $escolhida = $acessiveis->firstWhere('id', $this->preferencia('unidade_id'));
+
+            if ($escolhida !== null) {
+                return $escolhida;
+            }
+        }
+
+        return $acessiveis->firstWhere('id', $this->unidade_padrao_id) ?? $acessiveis->first();
     }
 
     // ---------------------------------------------------------------------
@@ -94,10 +166,10 @@ class User extends Authenticatable
         return $this->ativo && ! $this->estaBloqueado();
     }
 
-    /** Enxerga todas as unidades da academia? */
-    public function enxergaTodasAsUnidades(): bool
+    /** Tem mais de uma unidade E permissão para trocar entre elas? */
+    public function podeTrocarDeUnidade(): bool
     {
-        return $this->unidades()->count() === 0;
+        return $this->pode_alternar_unidade && $this->unidadesAcessiveis()->count() > 1;
     }
 
     /** Lê uma preferência de interface, com valor padrão quando ausente. */
