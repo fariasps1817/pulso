@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\DefinirAcademiaAtual;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,7 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        /*
+         * A academia atual é definida logo depois da sessão iniciar e antes
+         * de qualquer consulta ao domínio — é ela que alimenta as políticas
+         * de Row Level Security no PostgreSQL.
+         */
+        $middleware->web(append: [
+            DefinirAcademiaAtual::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

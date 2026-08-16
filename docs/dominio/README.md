@@ -603,8 +603,42 @@ Você informará qual usaremos. O modelo já prevê `notificacoes` com `canal`, 
 
 ---
 
-## 9. O que acontece depois deste documento
+## 9. Situação da implementação
 
-1. **Design system** — os ~19 componentes de [`../interface/README.md`](../interface/README.md), com página de catálogo para você revisar.
-2. **Migrations, models e RLS** — com testes que provam o isolamento entre academias.
-3. **Telas de CRUD** — montadas sobre componentes prontos.
+| Etapa | Situação |
+|---|---|
+| Design system — 27 componentes, catálogo em `/catalogo` | ✅ |
+| Migrations (26), models (16), enums, casts e RLS | ✅ |
+| Testes de isolamento e de regras do banco | ✅ 87 casos |
+| Telas de CRUD | ⬜ próxima |
+
+### 9.1 Onde cada decisão virou código
+
+| Decisão deste documento | Onde vive |
+|---|---|
+| Isolamento por RLS | `2026_08_16_001900_ativa_row_level_security` |
+| Filtro na aplicação e preenchimento do `academia_id` | `App\Models\Concerns\PertenceAAcademia` |
+| Academia da requisição vem do usuário | `App\Http\Middleware\DefinirAcademiaAtual` |
+| "Vencida" não é coluna | `Mensalidade::scopeVencidas()` + índice parcial |
+| Valor copiado do plano | `matriculas.valor_mensal` |
+| Dia de vencimento entre 1 e 28 | `CHECK matriculas_dia_vencimento_valido` |
+| Matrícula regular exige contrato | `CHECK matriculas_regular_exige_contrato` |
+| Sem matrículas sobrepostas | `EXCLUDE matriculas_sem_sobreposicao` (btree_gist) |
+| Uma mensalidade por competência | `UNIQUE mensalidades_uma_por_competencia` |
+| Biometria exige consentimento | `CHECK credenciais_biometria_exige_consentimento` |
+| Um lembrete por mensalidade | `UNIQUE notificacoes_um_lembrete_por_mensalidade` |
+| Motivo do bloqueio nunca na catraca | `App\Enums\MotivoBloqueioAcesso` |
+| Caixa de título ao gravar | `App\Casts\CaixaDeTitulo` |
+| Só dígitos em documento e telefone | `App\Casts\ApenasDigitos` |
+| Papéis por academia | `PapeisSeeder` + `teams` do spatie |
+
+### 9.2 O que o teste de isolamento prova
+
+Em `tests/Feature/Isolamento/`:
+
+- a conexão da aplicação **não** é superusuária nem tem `BYPASSRLS` — sem isso, os demais casos passariam sem provar nada;
+- dado de uma academia não aparece na outra, nem por Eloquent, nem por consulta crua, nem com os filtros da aplicação desligados;
+- não se consegue **gravar**, **atualizar** nem **excluir** linha de academia alheia;
+- sem academia definida, nada é visível — falha fechando;
+- o super administrador não enxerga aluno, mensalidade nem biometria;
+- toda tabela de domínio tem RLS **ativo e forçado**, com política. Criar tabela nova e esquecer a política quebra o teste.

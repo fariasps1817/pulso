@@ -44,8 +44,12 @@ Por isso existem duas conexões em `config/database.php`:
 ```
 app/
   Actions/Fortify/     Ações de autenticação (criar usuário, trocar senha)
+  Casts/               Normalização ao gravar (caixa de título, só dígitos)
+  Enums/               Situações e tipos do domínio
+  Http/Middleware/     DefinirAcademiaAtual — alimenta o RLS
+  Models/              16 models; Concerns/PertenceAAcademia aplica o filtro
   Providers/           AppServiceProvider, FortifyServiceProvider
-  Support/             Formatação pt-BR (dinheiro, telefone)
+  Support/             Formatação pt-BR, validação de CPF/CNPJ, contexto
 config/
   pulso.php            Nome, slogans e contatos — fonte única
 database/
@@ -120,11 +124,14 @@ psql -U postgres -d pulso_teste -f database/postgres/02-privilegios.sql
 Depois preencha `DB_PASSWORD` e `DB_ADMIN_PASSWORD` no `.env` e rode:
 
 ```bash
-composer db:migrar      # migra o banco pulso, pela conexão de manutenção
-composer db:teste       # recria o banco pulso_teste do zero
+composer db:migrar                          # migra o banco pulso
+composer db:teste                           # recria o banco pulso_teste do zero
+php artisan db:seed --database=pgsql_admin  # duas academias de demonstração
 ```
 
-Migrations **não** rodam pela conexão padrão: `pulso_app` não tem permissão de criar tabela, e é exatamente isso que faz o RLS valer.
+Migrations e seeders **não** rodam pela conexão padrão: `pulso_app` não tem permissão de criar tabela e está sujeito ao RLS — e é exatamente isso que faz o isolamento valer.
+
+Acesso de demonstração: `dono@alpha-fit.com.br` / `pulso1234`.
 
 > **No Laragon**, o `pg_hba.conf` vem com método `trust` — qualquer conexão local é aceita sem senha. É aceitável numa máquina de desenvolvimento. **Na VPS, use `scram-sha-256`** e senha forte, e não exponha a porta 5432 para fora.
 
@@ -161,8 +168,8 @@ Detalhamento da identidade em [`docs/marca/README.md`](docs/marca/README.md).
 | 1. Fundação, design system, página inicial e acesso | ✅ concluída |
 | 2a. Modelo de domínio e convenções de interface, em texto | ✅ concluída |
 | 2b. Design system — 27 componentes e o catálogo em `/catalogo` | ✅ concluída |
-| 2c. Migrations, models e Row Level Security | ⬜ próxima |
-| 3. Cadastros: alunos, planos, matrículas | ⬜ |
+| 2c. Banco: 26 migrations, 16 models e Row Level Security | ✅ concluída |
+| 3. Telas de CRUD: alunos, planos, matrículas | ⬜ próxima |
 | 4. Financeiro: mensalidades, pagamentos, Pix | ⬜ |
 | 5. Controle de acesso: catraca e biometria | ⬜ |
 | 6. Radar | ⬜ |

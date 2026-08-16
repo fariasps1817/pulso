@@ -13,4 +13,15 @@ parameters:
     # brigar com o Eloquent. Subir para 8 quando o dominio estiver estavel.
     level: 6
 
+    # Faz o Larastan LER o corpo do metodo casts() dos models, em vez de olhar
+    # so a assinatura `: array`. Sem isto, ele nao sabe que data_nascimento e
+    # CarbonImmutable nem que situacao e um enum — e passa a acusar erro em
+    # codigo correto, do tipo "Cannot call diffInYears() on string".
+    parseModelCastsMethod: true
+
+    # Confere se a propriedade existe de fato na tabela. Depende do
+    # databaseMigrationsPath abaixo para descobrir o schema.
     checkModelProperties: true
+
+    databaseMigrationsPath:
+        - database/migrations
