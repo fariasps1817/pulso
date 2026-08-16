@@ -188,6 +188,32 @@ final class SegurancaDoAcessoTest extends ContextoDeAcademia
         );
     }
 
+    /**
+     * E-mail atendido por duas contas: o login RECUSA, em vez de escolher.
+     *
+     * O banco permite o mesmo e-mail em academias diferentes — o índice único
+     * é `(academia_id, email)`. Mas o login recebe só o e-mail. Pegar a
+     * primeira colocaria alguém dentro dos dados da academia errada, que é
+     * falha de isolamento na prática ainda que o banco esteja correto.
+     *
+     * Aconteceu de verdade no banco local, depois de o seeder rodar duas vezes.
+     */
+    public function test_e_mail_em_duas_academias_nao_entra_em_nenhuma(): void
+    {
+        $daqui = $this->usuario();
+
+        $deLa = $this->naOutraAcademia(fn ($outra) => User::factory()
+            ->daAcademia($outra->id)
+            ->create(['email' => $daqui->email, 'password' => 'SenhaBoa1234']));
+
+        $this->assertNotSame($daqui->id, $deLa->id);
+
+        $this->assertNull(
+            app(PorteiroDoLogin::class)->autenticar($daqui->email, 'SenhaBoa1234', '10.0.0.5'),
+            'Com o e-mail ambíguo, entrar na academia errada é pior do que não entrar.',
+        );
+    }
+
     // -----------------------------------------------------------------
     // Sessão única
     // -----------------------------------------------------------------

@@ -34,6 +34,26 @@ final class DemonstracaoSeeder extends Seeder
 {
     public function run(): void
     {
+        /*
+         * NAO RODA DUAS VEZES.
+         *
+         * Sem esta guarda, executar o seeder num banco ja populado criava uma
+         * SEGUNDA Alpha Fit e uma segunda Corpo em Movimento — clientes
+         * duplicados na tela do super administrador, com o mesmo e-mail de
+         * dono em ambas. E o login, que recebe so o e-mail, ficava sem saber
+         * em qual entrar.
+         *
+         * Aconteceu de verdade. E o rastro nao era obvio: a execucao morria
+         * depois, no e-mail unico do super administrador, deixando o banco
+         * meio populado e a mensagem de erro apontando para o lugar errado.
+         */
+        if (Academia::query()->exists()) {
+            $this->command->warn('Ja existem academias cadastradas — o seeder de demonstracao nao roda de novo.');
+            $this->command->line('Para recomecar do zero: php artisan migrate:fresh --database=pgsql_admin --seed');
+
+            return;
+        }
+
         $contexto = app(ContextoAcademia::class);
 
         $alpha = $this->criarAcademia('Alpha Fit', 'Fortaleza', comFiliais: true);

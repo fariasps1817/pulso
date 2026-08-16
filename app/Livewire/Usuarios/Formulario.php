@@ -104,6 +104,13 @@ final class Formulario extends Component
     {
         return [
             'name' => ['required', 'string', 'min:3', 'max:255'],
+            /*
+             * Unico no sistema INTEIRO, embora o banco permita o mesmo e-mail
+             * em academias diferentes (indice `(academia_id, email)`). A
+             * aplicacao e mais restrita de proposito: o login recebe so o
+             * e-mail e nao tem como perguntar de qual academia se trata.
+             * Afrouxar isto exige antes a escolha de academia no login.
+             */
             'email' => [
                 'required', 'email', 'max:255',
                 Rule::unique('users', 'email')->ignore($this->usuario?->id),
@@ -125,7 +132,7 @@ final class Formulario extends Component
         return [
             'name.required' => 'Informe o nome da pessoa.',
             'email.required' => 'Informe o e-mail — é com ele que se entra no sistema.',
-            'email.unique' => 'Este e-mail já está em uso. O acesso ao Pulso é um por pessoa, mesmo entre academias diferentes.',
+            'email.unique' => 'Este e-mail já entra no Pulso. Use outro — enquanto o login não pergunta a academia, cada e-mail responde por uma conta só.',
             'papel.in' => 'Você não pode atribuir este papel.',
             'unidade_padrao_id.required' => 'Escolha a unidade onde a pessoa trabalha.',
         ];

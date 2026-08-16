@@ -245,6 +245,46 @@ final class AreaDoSuperAdministradorTest extends ContextoDeAcademia
             ->assertOk();
     }
 
+    /**
+     * A data da assinatura usa máscara brasileira na tela.
+     *
+     * Entregar o formato do banco ao campo mascarado produzia `20/27/0216` —
+     * e salvar de volta gravaria lixo ou uma data trocada.
+     */
+    public function test_a_data_da_assinatura_vai_e_volta_no_formato_brasileiro(): void
+    {
+        $this->academia->update(['assinatura_vence_em' => '2027-02-16']);
+
+        $componente = Livewire::actingAs($this->superAdministrador())
+            ->test(DetalhesDaAcademia::class, ['academia' => $this->academia->fresh()]);
+
+        $componente->assertSet('assinatura_vence_em', '16/02/2027');
+
+        $componente
+            ->set('assinatura_vence_em', '31/12/2027')
+            ->call('alterarSituacao')
+            ->assertHasNoErrors();
+
+        $this->assertSame('2027-12-31', $this->academia->fresh()->assinatura_vence_em->toDateString());
+    }
+
+    /**
+     * O papel só existe DENTRO de uma academia. Sem definir a da tela, a
+     * coluna mostrava um travessão para a equipe inteira.
+     */
+    public function test_mostra_o_papel_de_cada_um_da_equipe(): void
+    {
+        $this->usuarioCom('dono', ['name' => 'Dona Da Alpha']);
+        $this->usuarioCom('recepcao', ['name' => 'Moca Da Recepcao']);
+
+        Livewire::actingAs($this->superAdministrador())
+            ->test(DetalhesDaAcademia::class, ['academia' => $this->academia])
+            ->assertViewHas('equipe', fn ($equipe) => $equipe->every(
+                fn ($pessoa) => $pessoa->getRoleNames()->isNotEmpty(),
+            ))
+            ->assertSee('Recepção');
+    }
+
     /** Usuário desativado pelo gestor cai na mesma porta. */
     public function test_usuario_desativado_nao_entra(): void
     {

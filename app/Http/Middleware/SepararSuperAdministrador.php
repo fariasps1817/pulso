@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\Http\RequisicaoDoLivewire;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,13 +27,21 @@ use Symfony\Component\HttpFoundation\Response;
 final class SepararSuperAdministrador
 {
     /** Telas que servem aos dois. */
-    private const COMUNS = ['senha', 'logout', 'livewire/*', 'preferencias'];
+    private const COMUNS = ['senha', 'logout', 'preferencias'];
 
     public function handle(Request $requisicao, Closure $seguir): Response
     {
         $usuario = Auth::user();
 
-        if ($usuario === null || $requisicao->is(...self::COMUNS)) {
+        /*
+         * As chamadas internas do Livewire passam sempre. Desviá-las não
+         * protege nada — vêm do mesmo usuário, na mesma sessão, para a tela
+         * que ele já tem aberta — e era o que jogava o super administrador de
+         * volta para a lista a cada clique.
+         */
+        if ($usuario === null
+            || RequisicaoDoLivewire::ehInterna($requisicao)
+            || $requisicao->is(...self::COMUNS)) {
             return $seguir($requisicao);
         }
 

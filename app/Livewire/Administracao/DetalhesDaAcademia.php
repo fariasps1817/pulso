@@ -7,8 +7,10 @@ namespace App\Livewire\Administracao;
 use App\Enums\SituacaoAcademia;
 use App\Models\Academia;
 use App\Models\User;
+use App\Rules\DataBrasileira;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -38,7 +40,11 @@ final class DetalhesDaAcademia extends Component
         $this->academia = $academia;
         $this->situacao = $academia->situacao->value;
         $this->motivo_bloqueio = (string) $academia->motivo_bloqueio;
-        $this->assinatura_vence_em = $academia->assinatura_vence_em?->toDateString();
+        /*
+         * `d/m/Y`, e nao o formato do banco: o campo tem mascara brasileira, e
+         * entregar `2027-02-16` a ela produzia `20/27/0216` na tela.
+         */
+        $this->assinatura_vence_em = $academia->assinatura_vence_em?->format('d/m/Y');
     }
 
     /**
@@ -56,10 +62,14 @@ final class DetalhesDaAcademia extends Component
         $this->validate([
             'situacao' => ['required'],
             'motivo_bloqueio' => [$exigeMotivo ? 'required' : 'nullable', 'string', 'max:1000'],
-            'assinatura_vence_em' => ['nullable', 'date'],
+            'assinatura_vence_em' => ['nullable', new DataBrasileira],
         ], [
             'motivo_bloqueio.required' => 'Diga por que a academia está sendo suspensa. Quem atender o telefone dela amanhã precisa saber.',
         ]);
+
+        $vencimento = $this->assinatura_vence_em !== null && $this->assinatura_vence_em !== ''
+            ? DataBrasileira::converter($this->assinatura_vence_em)?->toDateString()
+            : null;
 
         $this->academia->update([
             'situacao' => $nova,
@@ -69,7 +79,7 @@ final class DetalhesDaAcademia extends Component
             'bloqueada_em' => $exigeMotivo
                 ? ($this->academia->bloqueada_em ?? CarbonImmutable::now())
                 : null,
-            'assinatura_vence_em' => $this->assinatura_vence_em ?: null,
+            'assinatura_vence_em' => $vencimento,
         ]);
 
         $this->academia->refresh();
@@ -78,6 +88,34 @@ final class DetalhesDaAcademia extends Component
             'tipo' => $exigeMotivo ? 'atencao' : 'sucesso',
             'texto' => "Situação alterada para {$nova->rotulo()}.",
         ]);
+    }
+
+    /**
+     * A equipe, com o papel de cada um.
+     *
+     * O pacote de permissoes resolve papel DENTRO de uma academia — quem e
+     * gerente aqui nao e gerente na vizinha. O super administrador nao tem
+     * academia, entao sem definir a desta tela os papeis voltavam vazios e a
+     * coluna mostrava um travessao para todo mundo.
+     *
+     * @return Collection<int, User>
+     */
+    private function equipe()
+    {
+        setPermissionsTeamId($this->academia->id);
+
+        $equipe = User::query()
+            ->where('academia_id', $this->academia->id)
+            ->with('roles')
+            ->orderByDesc('ativo')
+            ->orderBy('name')
+            ->get();
+
+        // Devolve o estado: o super administrador nao pertence a academia
+        // nenhuma, e deixar o time preso aqui contaminaria o resto do pedido.
+        setPermissionsTeamId(null);
+
+        return $equipe;
     }
 
     public function render(): View
@@ -93,12 +131,7 @@ final class DetalhesDaAcademia extends Component
              * alcança, porque a autenticação precisa acontecer antes de
              * existir "academia atual".
              */
-            'equipe' => User::query()
-                ->where('academia_id', $this->academia->id)
-                ->with('roles')
-                ->orderByDesc('ativo')
-                ->orderBy('name')
-                ->get(),
+            'equipe' => $this->equipe(),
         ])->title($this->academia->nome);
     }
 }

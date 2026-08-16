@@ -8,10 +8,10 @@ use App\Enums\SituacaoAcademia;
 use App\Models\Academia;
 use App\Models\Unidade;
 use App\Models\User;
+use App\Rules\DataBrasileira;
 use App\Support\Academia\ContextoAcademia;
 use App\Support\Academia\PadroesDeAcesso;
 use App\Support\Documentos;
-use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -84,7 +84,7 @@ final class NovaAcademia extends Component
             'unidade_nome' => ['required', 'string', 'max:120'],
             'dono_nome' => ['required', 'string', 'min:3', 'max:255'],
             'dono_email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'assinatura_vence_em' => ['nullable', 'date'],
+            'assinatura_vence_em' => ['nullable', new DataBrasileira],
         ];
     }
 
@@ -98,7 +98,7 @@ final class NovaAcademia extends Component
             'unidade_nome.required' => 'A academia precisa de ao menos uma unidade.',
             'dono_nome.required' => 'Informe quem vai receber o acesso de dono.',
             'dono_email.required' => 'Informe o e-mail de quem vai entrar no sistema.',
-            'dono_email.unique' => 'Este e-mail já tem acesso ao Pulso, em outra academia.',
+            'dono_email.unique' => 'Este e-mail já entra no Pulso. Use outro — enquanto o login não pergunta a academia, cada e-mail responde por uma conta só.',
             'cnpj.unique' => 'Já existe uma academia cadastrada com este CNPJ.',
         ];
     }
@@ -180,8 +180,12 @@ final class NovaAcademia extends Component
             'unidade_nome' => trim($this->unidade_nome),
             'dono_nome' => trim($this->dono_nome),
             'dono_email' => mb_strtolower(trim($this->dono_email)),
+            /*
+             * O campo tem mascara brasileira: `Carbon::parse` leria
+             * "16/02/2027" como mes 16 e falharia, ou pior, como m/d/Y.
+             */
             'assinatura_vence_em' => $this->assinatura_vence_em !== null && $this->assinatura_vence_em !== ''
-                ? CarbonImmutable::parse($this->assinatura_vence_em)->toDateString()
+                ? DataBrasileira::converter($this->assinatura_vence_em)?->toDateString()
                 : null,
         ];
     }

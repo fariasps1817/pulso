@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\Http\RequisicaoDoLivewire;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class ExigirTrocaDeSenha
 {
     /** @var list<string> */
-    private const LIBERADAS = ['senha', 'logout', 'livewire/*'];
+    private const LIBERADAS = ['senha', 'logout'];
 
     public function handle(Request $requisicao, Closure $seguir): Response
     {
@@ -34,11 +35,15 @@ final class ExigirTrocaDeSenha
         }
 
         /*
-         * `livewire/*` fica de fora porque é por ele que a própria tela de
-         * troca funciona. A tela em si valida quem pode fazer o quê — o
-         * middleware aqui cuida da navegação, não da autorização.
+         * A chamada interna do Livewire passa: é por ela que a PRÓPRIA tela de
+         * troca funciona. Desviá-la impedia o formulário de concluir — ou
+         * seja, nenhum usuário novo conseguia definir a senha, e portanto
+         * nenhum conseguia entrar no sistema.
+         *
+         * Isso não abre porta: a tela de destino é que valida quem pode o quê.
+         * O middleware aqui cuida de navegação, não de autorização.
          */
-        if ($requisicao->is(...self::LIBERADAS)) {
+        if (RequisicaoDoLivewire::ehInterna($requisicao) || $requisicao->is(...self::LIBERADAS)) {
             return $seguir($requisicao);
         }
 

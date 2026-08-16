@@ -8,6 +8,7 @@ use App\Models\TentativaLogin;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Quem tenta entrar, quantas vezes, e quando para de poder tentar.
@@ -62,7 +63,33 @@ final class PorteiroDoLogin
             return null;
         }
 
-        $usuario = User::query()->where('email', $email)->first();
+        $candidatos = User::query()->where('email', $email)->limit(2)->get();
+
+        /*
+         * MAIS DE UMA CONTA COM O MESMO E-MAIL: recusa, em vez de escolher.
+         *
+         * O banco permite o mesmo e-mail em academias diferentes — o índice
+         * único é `(academia_id, email)`, pensado para o profissional que
+         * atende em duas academias. Mas o login recebe SÓ o e-mail, e não tem
+         * como saber em qual delas a pessoa quer entrar.
+         *
+         * Pegar a primeira colocaria alguém dentro dos dados da academia
+         * errada. Isso é falha de isolamento na prática, ainda que o banco
+         * esteja correto — muito pior do que recusar e pedir suporte.
+         *
+         * A saída definitiva é perguntar a academia no login. Enquanto ela não
+         * existe, os formulários exigem e-mail único no sistema inteiro, e
+         * esta guarda cobre o dado que já estiver duplicado.
+         */
+        if ($candidatos->count() > 1) {
+            Log::warning('E-mail atendido por mais de uma conta; login recusado.', ['email' => $email]);
+
+            TentativaLogin::registrar($email, $ip, false, $agente);
+
+            return null;
+        }
+
+        $usuario = $candidatos->first();
 
         // Hash::check contra hash nulo é impossível, mas o tempo de resposta
         // não pode denunciar a diferença — daí o hash falso.
