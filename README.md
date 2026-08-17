@@ -182,6 +182,8 @@ A mensagem de bloqueio é **idêntica** para conta existente e inexistente, e a 
 | Painel da academia | quem tem `academia_id` | `/painel` |
 | Administração do SaaS | quem tem `academia_id` **nulo** | `/administracao` |
 
+**"Em aviso" não mostra mensagem nenhuma sozinho.** É só a marca comercial da pendência, do lado do Pulso. O texto que a academia lê vem de um **aviso publicado**, que tem vida própria — data de início e de fim. A ficha da academia mostra quais estão no ar para não confundir os dois.
+
 O Pulso fala com o cliente por **avisos** (`/administracao/avisos`), que aparecem no topo de toda tela da academia. O aviso pode ser marcado como **não dispensável** — é o caso do alerta de bloqueio, que não pode sumir com um clique e deixar o dono descobrir na segunda-feira.
 
 O super administrador é a equipe do Pulso. Ele **não pertence a academia nenhuma**, e é isso — não um papel atribuído por tela — que define quem ele é. Como as políticas de Row Level Security comparam `academia_id` com o contexto da requisição, e o dele é vazio, **nenhuma linha de aluno, mensalidade ou biometria aparece para ele**. Não há exceção no banco.

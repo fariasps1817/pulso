@@ -54,6 +54,14 @@
         </div>
 
         <div class="flex flex-col gap-2">
+            {{--
+                `$attributes` PRECISA cair aqui, no próprio campo de arquivo.
+
+                Sem isso o `wire:model` ficava no componente e nunca chegava ao
+                input: o Livewire não via arquivo nenhum, o envio não
+                acontecia, e salvar simplesmente ignorava a imagem — sem erro,
+                sem mensagem, sem pista.
+            --}}
             <input
                 type="file"
                 id="{{ $id }}"
@@ -63,6 +71,7 @@
                 @change="escolher"
                 class="sr-only"
                 @if ($obrigatorio) required @endif
+                {{ $attributes->except(['id', 'class']) }}
             >
 
             <label for="{{ $id }}"

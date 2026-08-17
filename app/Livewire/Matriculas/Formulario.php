@@ -161,6 +161,17 @@ final class Formulario extends Component
             'observacoes' => trim($this->observacoes) !== '' ? trim($this->observacoes) : null,
         ];
 
+        /*
+         * LIMPAR O SACO DE ERROS ANTES DE VALIDAR DE NOVO.
+         *
+         * A validação aqui é feita com `Validator::make(...)`, e não com
+         * `$this->validate()`. A diferença é silenciosa e cara: o Livewire só
+         * TROCA o saco de erros quando uma ValidationException é lançada.
+         * Passando a validação, as críticas da tentativa anterior continuam
+         * lá — a pessoa corrige o campo e a mensagem não some.
+         */
+        $this->resetValidation();
+
         Validator::make($dados, $this->rules(), $this->messages())->validate();
 
         $inicio = DataBrasileira::converter($this->inicio_em);

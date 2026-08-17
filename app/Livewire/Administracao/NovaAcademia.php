@@ -10,6 +10,7 @@ use App\Models\Unidade;
 use App\Models\User;
 use App\Rules\DataBrasileira;
 use App\Services\Acesso\SenhaTemporaria;
+use App\Services\Enderecos\Ibge;
 use App\Support\Academia\ContextoAcademia;
 use App\Support\Academia\PadroesDeAcesso;
 use App\Support\Documentos;
@@ -49,7 +50,7 @@ final class NovaAcademia extends Component
 
     public string $cidade = '';
 
-    public string $uf = 'CE';
+    public string $uf = '';
 
     public string $unidade_nome = 'Matriz';
 
@@ -85,6 +86,8 @@ final class NovaAcademia extends Component
             'unidade_nome' => ['required', 'string', 'max:120'],
             'dono_nome' => ['required', 'string', 'min:3', 'max:255'],
             'dono_email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            // Validada sobre o TEXTO da tela, não sobre a conversão — ver
+            // a nota em `salvar()`.
             'assinatura_vence_em' => ['nullable', new DataBrasileira],
         ];
     }
@@ -106,9 +109,33 @@ final class NovaAcademia extends Component
 
     public function salvar(ContextoAcademia $contexto): void
     {
+        /*
+         * LIMPAR O SACO DE ERROS ANTES DE VALIDAR DE NOVO.
+         *
+         * A validação aqui é feita com `Validator::make(...)`, e não com
+         * `$this->validate()`. A diferença é silenciosa e cara: o Livewire só
+         * TROCA o saco de erros quando uma ValidationException é lançada.
+         * Passando a validação, as críticas da tentativa anterior continuam
+         * lá — a pessoa corrige o campo e a mensagem não some.
+         */
+        $this->resetValidation();
+
         $dados = $this->dadosNormalizados();
 
-        Validator::make($dados, $this->rules(), $this->messages())->validate();
+        /*
+         * A data é validada com o que a PESSOA digitou, e não com o que
+         * `dadosNormalizados()` devolveu.
+         *
+         * O defeito era exatamente esse: a normalização já convertia
+         * "31/12/2027" em "2027-12-31", e a regra brasileira então reprovava
+         * a própria conversão — a tela dizia "informe uma data no formato
+         * dd/mm/aaaa" por mais correta que a data estivesse.
+         */
+        Validator::make(
+            [...$dados, 'assinatura_vence_em' => $this->assinatura_vence_em],
+            $this->rules(),
+            $this->messages(),
+        )->validate();
 
         $senha = SenhaTemporaria::gerar();
 
@@ -193,6 +220,16 @@ final class NovaAcademia extends Component
 
     public function render(): View
     {
-        return view('livewire.administracao.nova-academia');
+        $ibge = app(Ibge::class);
+
+        return view('livewire.administracao.nova-academia', [
+            'estados' => $ibge->estados(),
+            /*
+             * A lista de municípios só é buscada com o estado escolhido — são
+             * 5.570 no país, e trazer todos para filtrar na tela seria carga
+             * inútil em toda abertura do formulário.
+             */
+            'municipios' => $this->uf !== '' ? $ibge->municipios($this->uf) : [],
+        ]);
     }
 }

@@ -56,8 +56,19 @@
                     <x-ui.campo-mascara largura="25" nome="whatsapp" rotulo="WhatsApp" formato="telefone"
                                         :obrigatorio="false" wire:model.blur="whatsapp" />
 
-                    <x-ui.campo largura="50" nome="cidade" rotulo="Cidade" wire:model.blur="cidade" />
-                    <x-ui.campo largura="25" nome="uf" rotulo="Estado" wire:model.blur="uf" />
+                    {{-- Estado e cidade vêm do IBGE, nunca de digitação livre:
+                         texto livre produz "Fortaleza", "fortaleza" e
+                         "Frotaleza" na mesma base. --}}
+                    <x-ui.selecao largura="25" nome="uf" rotulo="Estado"
+                                  wire:model.live="uf" :opcoes="$estados" />
+
+                    @if ($municipios === [])
+                        <x-ui.campo largura="50" nome="cidade" rotulo="Cidade" wire:model.blur="cidade"
+                                    :ajuda="$uf !== '' ? 'Lista do IBGE indisponível — digite à mão.' : null" />
+                    @else
+                        <x-ui.selecao largura="50" nome="cidade" rotulo="Cidade" wire:model="cidade"
+                                      :opcoes="array_combine($municipios, $municipios)" />
+                    @endif
                     <x-ui.campo-mascara largura="25" nome="assinatura_vence_em" rotulo="Assinatura vence em"
                                         formato="data" :obrigatorio="false"
                                         wire:model.blur="assinatura_vence_em" />

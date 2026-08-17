@@ -141,6 +141,17 @@ final class Formulario extends Component
 
     public function salvar(): void
     {
+        /*
+         * LIMPAR O SACO DE ERROS ANTES DE VALIDAR DE NOVO.
+         *
+         * A validação aqui é feita com `Validator::make(...)`, e não com
+         * `$this->validate()`. A diferença é silenciosa e cara: o Livewire só
+         * TROCA o saco de erros quando uma ValidationException é lançada.
+         * Passando a validação, as críticas da tentativa anterior continuam
+         * lá — a pessoa corrige o campo e a mensagem não some.
+         */
+        $this->resetValidation();
+
         $dados = $this->dadosNormalizados();
 
         // `papel` e `unidades` são validados, mas não são colunas do usuário:

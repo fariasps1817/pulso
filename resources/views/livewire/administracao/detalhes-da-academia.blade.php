@@ -130,6 +130,44 @@
                 <x-ui.botao tipo="submit">Aplicar</x-ui.botao>
             </form>
 
+            {{--
+                A ligacao que faltava.
+
+                "Em aviso" e uma marca comercial: NAO mostra texto nenhum na
+                academia. O recado que ela le vem de um aviso publicado, que
+                tem vida propria — data de inicio e de fim. Sem dizer isso, a
+                tela engana: alguem poe "Em aviso", ve a mensagem la, volta
+                aqui e devolve para "Ativa" esperando que a mensagem suma.
+            --}}
+            <div class="border-t border-borda pt-4">
+                <div class="flex items-baseline justify-between gap-3">
+                    <h3 class="font-medium text-texto">Recados que ela esta vendo</h3>
+                    <a href="{{ route('administracao.avisos') }}"
+                       class="rounded-sm text-sm text-acao hover:underline
+                              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foco">
+                        Publicar →
+                    </a>
+                </div>
+
+                @forelse ($avisosNoAr as $aviso)
+                    <p wire:key="no-ar-{{ $aviso->id }}" class="mt-2 text-sm text-texto-2">
+                        {{ $aviso->titulo }}
+                        <span class="numeros block text-texto-mudo">
+                            ate {{ $aviso->exibir_ate->format('d/m/Y') }}
+                            @unless ($aviso->dispensavel)
+                                · nao pode ser fechado
+                            @endunless
+                        </span>
+                    </p>
+                @empty
+                    <p class="mt-2 text-sm text-texto-mudo">
+                        Nenhum. A situacao "Em aviso" sozinha nao mostra mensagem alguma para a
+                        academia — ela so marca a pendencia aqui. Para o cliente ler alguma coisa,
+                        publique um aviso.
+                    </p>
+                @endforelse
+            </div>
+
             <dl class="border-t border-borda pt-4 text-sm">
                 <div class="flex justify-between gap-3">
                     <dt class="text-texto-mudo">Entrar no sistema</dt>

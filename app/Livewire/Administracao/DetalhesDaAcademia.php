@@ -6,6 +6,7 @@ namespace App\Livewire\Administracao;
 
 use App\Enums\SituacaoAcademia;
 use App\Models\Academia;
+use App\Models\AvisoAcademia;
 use App\Models\User;
 use App\Rules\DataBrasileira;
 use App\Services\Acesso\SenhaTemporaria;
@@ -172,6 +173,19 @@ final class DetalhesDaAcademia extends Component
              * existir "academia atual".
              */
             'equipe' => $this->equipe(),
+            /*
+             * Os recados que a academia esta vendo AGORA.
+             *
+             * Sem isso a tela enganava: "Em aviso" e so uma marca comercial e
+             * nao mostra texto nenhum ao cliente — quem via uma mensagem na
+             * academia e voltava aqui para desliga-la mudando a situacao
+             * descobria que a mensagem continuava, porque ela vinha de um
+             * aviso publicado, que e outra coisa.
+             */
+            'avisosNoAr' => AvisoAcademia::query()
+                ->visiveisPara($this->academia->id)
+                ->orderBy('id')
+                ->get(),
         ])->title($this->academia->nome);
     }
 }

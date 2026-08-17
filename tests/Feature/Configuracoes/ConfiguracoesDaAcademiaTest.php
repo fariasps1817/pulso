@@ -94,6 +94,30 @@ final class ConfiguracoesDaAcademiaTest extends ContextoDeAcademia
             ->assertHasErrors('cnpj');
     }
 
+    /**
+     * O `wire:model` precisa cair NO CAMPO DE ARQUIVO.
+     *
+     * O componente de imagem não repassava os atributos ao input, então o
+     * Livewire nunca via arquivo nenhum: escolher a imagem e salvar não fazia
+     * nada — sem erro, sem mensagem, sem pista. O teste que grava a logo não
+     * pegava isso, porque define a propriedade direto em vez de passar pela
+     * tela.
+     */
+    public function test_o_campo_de_arquivo_esta_ligado_ao_componente(): void
+    {
+        $html = Livewire::actingAs($this->usuarioCom('dono'))
+            ->test(DadosDaAcademia::class)
+            ->html();
+
+        $this->assertSame(
+            1,
+            preg_match('/<input[^>]*type="file"[^>]*>/s', $html, $achado),
+            'A tela precisa ter um campo de arquivo para a logo.',
+        );
+
+        $this->assertStringContainsString('wire:model="logo"', $achado[0]);
+    }
+
     public function test_guarda_a_logo_da_academia(): void
     {
         Storage::fake('public');

@@ -12,6 +12,7 @@ use App\Livewire\Configuracoes as ConfiguracoesDaAcademia;
 use App\Livewire\Matriculas;
 use App\Livewire\Mensalidades;
 use App\Livewire\Painel;
+use App\Livewire\Perfil;
 use App\Livewire\Planos;
 use App\Livewire\Usuarios;
 use Illuminate\Support\Facades\Route;
@@ -106,9 +107,18 @@ Route::middleware(['auth'])->group(function (): void {
     });
 
     /*
-     * Configuracoes da academia — o guarda-chuva do que ela ajusta por conta
-     * propria. Hoje so usuarios; dados da academia, unidades e regras de
-     * cobranca entram aqui.
+     * O perfil e do usuario; as configuracoes sao da academia. Quem cuida de
+     * si entra por aqui — e ninguem edita a propria conta pela tela de
+     * usuarios, onde o gestor administra a equipe.
+     */
+    Route::prefix('perfil')->name('perfil.')->group(function (): void {
+        Route::get('/', Perfil\Dados::class)->name('dados');
+        Route::get('/preferencias', Perfil\Preferencias::class)->name('preferencias');
+    });
+
+    /*
+     * Configuracoes da ACADEMIA — o guarda-chuva do que ela ajusta por conta
+     * propria: dados impressos, regras de cobranca e a equipe.
      */
     Route::view('/configuracoes', 'configuracoes.painel')->name('configuracoes.painel');
 

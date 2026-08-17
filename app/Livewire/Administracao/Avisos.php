@@ -57,6 +57,17 @@ final class Avisos extends Component
 
     public function publicar(): void
     {
+        /*
+         * LIMPAR O SACO DE ERROS ANTES DE VALIDAR DE NOVO.
+         *
+         * A validação aqui é feita com `Validator::make(...)`, e não com
+         * `$this->validate()`. A diferença é silenciosa e cara: o Livewire só
+         * TROCA o saco de erros quando uma ValidationException é lançada.
+         * Passando a validação, as críticas da tentativa anterior continuam
+         * lá — a pessoa corrige o campo e a mensagem não some.
+         */
+        $this->resetValidation();
+
         $dados = [
             'academia_id' => $this->academia_id,
             'tipo' => $this->tipo,
