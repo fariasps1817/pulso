@@ -64,6 +64,9 @@ database/
 docs/
   dominio/             Modelo de dados, regras de negócio e permissões
   interface/           Máscaras, padrão de CRUD, layout e componentes
+  comparativo-palaistra.md  Avaliação de outro sistema de academia: o que
+                       aproveitar, o que descartar, e três achados que valem
+                       decisão antes do deploy
 docs/marca/            Guia de marca, tokens de design e assets
   README.md            Nome, slogans, logo, cores, temas, acessibilidade e LGPD
   tokens.css           Fonte da verdade das cores (temas claro e escuro)
